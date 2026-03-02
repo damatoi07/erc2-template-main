@@ -20,15 +20,15 @@ DigitalEncoder left_encoder(FEHIO::Pin9);
 AnalogInputPin CdS_cell(FEHIO::Pin3);
 
 void start(); 
-void move_forward(int percent, int counts);
+void move_forward(int percent, float counts);
 void turn_right(int percent, int counts);
 void turn_left(int percent, int counts); 
-float transitions_count (float s); 
+float transitions_count (float s); //s is distance to travel in inches
 
 void ERCMain()
 {
-    move_forward(FULL_POWER,(transitions_count(5)));
-    TestGUI();
+    LCD.WriteLine(transitions_count(3));
+    move_forward(FULL_POWER,(transitions_count(3)));
 }
 void start ()//Go after start light is detected to be ON or after 30 seconds
 {
@@ -37,7 +37,7 @@ void start ()//Go after start light is detected to be ON or after 30 seconds
     float CdS = CdS_cell.Value();
     while ( (i==1) || ((TimeNow() - start_time) <= TimeNow()))
     {
-        float Cds = CdS_cell.Value();
+        float CdS = CdS_cell.Value();
         if ((CdS <= (red+1))||(TimeNow()-start_time)>=30)
         {
             i=0;
@@ -45,8 +45,9 @@ void start ()//Go after start light is detected to be ON or after 30 seconds
         }
     }
 };
-void move_forward(int percent, int counts) //Drive Forward for a specified distance at a specified speed using encoders
+void move_forward(int percent, float counts) //Drive Forward for a specified distance at a specified speed using encoders
 {
+    LCD.WriteLine("Move_Forward Started");
     //Reset encoder counts
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
@@ -55,9 +56,13 @@ void move_forward(int percent, int counts) //Drive Forward for a specified dista
     right_motor.SetPercent(percent);
     left_motor.SetPercent(percent);
 
+
     //While the average of the left and right encoder is less than counts,
     //keep running motors
-    while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts);
+    while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
+    {
+        LCD.WriteLine((left_encoder.Counts() + right_encoder.Counts()) / 2.);
+    }
 
     //Turn off motors
     right_motor.Stop();
