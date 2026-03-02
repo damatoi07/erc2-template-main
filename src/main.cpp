@@ -30,6 +30,7 @@ void ERCMain()
     move_forward(FULL_POWER,(transitions_count(5)));
     TestGUI();
 }
+
 void start ()//Go after start light is detected to be ON or after 30 seconds
 {
     int i=1;
@@ -46,6 +47,7 @@ void start ()//Go after start light is detected to be ON or after 30 seconds
     }
     //first change
 };
+
 void move_forward(int percent, int counts) //Drive Forward for a specified distance at a specified speed using encoders
 {
     //Reset encoder counts
@@ -64,6 +66,7 @@ void move_forward(int percent, int counts) //Drive Forward for a specified dista
     right_motor.Stop();
     left_motor.Stop();
 };
+
 void turn_right(int percent, int counts)//Turn Right for a specified distance at a specified speed using encoders
 {
     //Reset encoder counts
@@ -82,6 +85,7 @@ void turn_right(int percent, int counts)//Turn Right for a specified distance at
     right_motor.Stop();
     left_motor.Stop();
 };
+
 void turn_left(int percent, int counts) //Turn Left for a specified distance at a specified speed using encoders
 {
     //Reset encoder counts
@@ -100,6 +104,7 @@ void turn_left(int percent, int counts) //Turn Left for a specified distance at 
     right_motor.Stop();
     left_motor.Stop();
 };
+
 int transitions_count (float s)//Calculate the number of transitions the encoder needs to count to tranvel a specified distance (s) in inches
 {
     return ((s*N)/(2*PI*r));
