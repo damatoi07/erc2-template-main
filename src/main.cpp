@@ -23,11 +23,10 @@ void start();
 void move_forward(int percent, float counts);
 void turn_right(int percent, int counts);
 void turn_left(int percent, int counts); 
-float transitions_count (float s); //s is distance to travel in inches
+float transitions_count (float s);
 
 void ERCMain()
 {
-    LCD.WriteLine(transitions_count(3));
     move_forward(FULL_POWER,(transitions_count(3)));
 }
 void start ()//Go after start light is detected to be ON or after 30 seconds
@@ -43,11 +42,10 @@ void start ()//Go after start light is detected to be ON or after 30 seconds
             i=0;
             //Start Composter Funtcion
         }
-    }
+    };
 };
 void move_forward(int percent, float counts) //Drive Forward for a specified distance at a specified speed using encoders
 {
-    LCD.WriteLine("Move_Forward Started");
     //Reset encoder counts
     right_encoder.ResetCounts();
     left_encoder.ResetCounts();
@@ -59,10 +57,7 @@ void move_forward(int percent, float counts) //Drive Forward for a specified dis
 
     //While the average of the left and right encoder is less than counts,
     //keep running motors
-    while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts)
-    {
-        LCD.WriteLine((left_encoder.Counts() + right_encoder.Counts()) / 2.);
-    }
+    while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts);
 
     //Turn off motors
     right_motor.Stop();
