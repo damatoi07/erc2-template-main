@@ -23,7 +23,7 @@ void start();
 void move_forward(int percent, int counts);
 void turn_right(int percent, int counts);
 void turn_left(int percent, int counts); 
-int transitions_count (float s); 
+float transitions_count (float s); 
 
 void ERCMain()
 {
@@ -99,7 +99,7 @@ void turn_left(int percent, int counts) //Turn Left for a specified distance at 
     right_motor.Stop();
     left_motor.Stop();
 };
-int transitions_count (float s)//Calculate the number of transitions the encoder needs to count to tranvel a specified distance (s) in inches
+float transitions_count (float s)//Calculate the number of transitions the encoder needs to count to tranvel a specified distance (s) in inches
 {
     return ((s*N)/(2*PI*r));
 }
