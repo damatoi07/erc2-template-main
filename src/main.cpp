@@ -32,7 +32,7 @@ void compost_bin();
 
 void ERCMain()
 {
-    move_forward(FULL_POWER,(transitions_count(3)));
+    move_forward(FULL_POWER,(transitions_count(36)));
 }
 void start ()//Go after start light is detected to be ON or after 30 seconds
 {
@@ -56,7 +56,7 @@ void move_forward(int percent, float counts) //Drive Forward for a specified dis
     left_encoder.ResetCounts();
 
     //Set both motors to desired percent
-    right_motor.SetPercent(percent);
+    right_motor.SetPercent(percent+2);
     left_motor.SetPercent(percent);
 
 
