@@ -33,6 +33,10 @@ void compost_bin();
 void ERCMain()
 {
     move_forward(FULL_POWER,(transitions_count(36)));
+    /*
+        Sleep(1.0);
+        move_forward(-FULL_POWER,(transitions_count(36)));
+    */
 }
 void start ()//Go after start light is detected to be ON or after 30 seconds
 {
