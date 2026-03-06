@@ -9,7 +9,7 @@
 #define r 2.5/2 //Radius of Wheels
 #define red 0.29 //Value for a red light with a red filter
 #define blue 1.93 //Value for a blue light with a red filter
-#define FULL_POWER 40.
+#define FULL_POWER 50.
 #define HALF_POWER 20.
 #define SERVO_INIT 500
 #define SERVO_FINAL 23858
@@ -33,10 +33,9 @@ void compost_bin();
 void ERCMain()
 {
     move_forward(FULL_POWER,(transitions_count(36)));
-    /*
-        Sleep(1.0);
-        move_forward(-FULL_POWER,(transitions_count(36)));
-    */
+    Sleep(1.0);
+    move_forward(-FULL_POWER,(transitions_count(36)));
+
 }
 void start ()//Go after start light is detected to be ON or after 30 seconds
 {
@@ -60,7 +59,7 @@ void move_forward(int percent, float counts) //Drive Forward for a specified dis
     left_encoder.ResetCounts();
 
     //Set both motors to desired percent
-    right_motor.SetPercent(percent+2);
+    right_motor.SetPercent(percent);
     left_motor.SetPercent(percent);
 
 
