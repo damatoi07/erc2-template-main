@@ -23,7 +23,7 @@ DigitalEncoder left_encoder(FEHIO::Pin9);
 AnalogInputPin CdS_cell(FEHIO::Pin3);
 FEHServo servo_arm(FEHServo::Servo7);
 
-void start(); 
+int start(); 
 void move_forward(int percent, float counts);
 void turn_right(int percent, int counts);
 void turn_left(int percent, int counts); 
@@ -32,24 +32,30 @@ void compost_bin();
 void turn_to_humidifier();
 
 void ERCMain()
-{
-    move_forward(FULL_POWER,(transitions_count(36)));
-    Sleep(1.0);
-    move_forward(-FULL_POWER,(transitions_count(36)));
-
+{ 
+    int initiate=0;
+    LCD.WriteLine("initiate 0");
+    initiate = start();
+    if (initiate==1)
+    {
+        LCD.WriteLine("initiated");
+        move_forward(FULL_POWER,(transitions_count(2)));
+        Sleep(1.0);
+        move_forward(-FULL_POWER,(transitions_count(2)));
+    }
 }
-void start ()//Go after start light is detected to be ON or after 30 seconds
+int start ()//Go after start light is detected to be ON or after 30 seconds
 {
-    int i=1;
+    int i=0;
     float start_time = TimeNow();
-    float CdS = CdS_cell.Value();
-    while ( (i==1) || ((TimeNow() - start_time) <= TimeNow()))
+    LCD.WriteLine("Start Function");
+    while (i==0)
     {
         float CdS = CdS_cell.Value();
-        if ((CdS <= (red+1))||(TimeNow()-start_time)>=30)
+        if ((CdS <= (red+1))||((TimeNow()-start_time)>=3))
         {
-            i=0;
-            //Start Composter Funtcion
+            i=1;
+            return(1);
         }
     };
 };
@@ -121,11 +127,11 @@ void compost_bin(){
 
     int i=1; 
     while (i==1) { 
-        
         servo_arm.SetDegree(0); 
         servo_arm.SetDegree(300);
         Sleep(1.0); 
         servo_arm.SetDegree(0);
+<<<<<<< Updated upstream
 
     }; 
 }
@@ -151,3 +157,7 @@ void turn_to_humidifier()
         LCD.WriteLine("No valid color detected");
     }
 }
+=======
+    }
+}
+>>>>>>> Stashed changes
