@@ -132,6 +132,7 @@ void compost_bin(){
         Sleep(1.0); 
         servo_arm.SetDegree(0);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
     }; 
 }
@@ -157,6 +158,10 @@ void turn_to_humidifier()
         LCD.WriteLine("No valid color detected");
     }
 }
+=======
+    }
+}
+>>>>>>> Stashed changes
 =======
     }
 }
