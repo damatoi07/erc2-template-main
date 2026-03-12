@@ -40,8 +40,6 @@ void ERCMain()
     {
         LCD.WriteLine("initiated");
         move_forward(FULL_POWER,(transitions_count(2)));
-        Sleep(1.0);
-        move_forward(-FULL_POWER,(transitions_count(2)));
     }
 }
 int start ()//Go after start light is detected to be ON or after 30 seconds
@@ -58,7 +56,7 @@ int start ()//Go after start light is detected to be ON or after 30 seconds
             return(1);
         }
     };
-};
+}
 void move_forward(int percent, float counts) //Drive Forward for a specified distance at a specified speed using encoders
 {
     //Reset encoder counts
@@ -117,8 +115,7 @@ void turn_left(int percent, int counts) //Turn Left for a specified distance at 
 float transitions_count (float s)//Calculate the number of transitions the encoder needs to count to tranvel a specified distance (s) in inches
 {
     return ((s*N)/(2*PI*r));
-}
-
+};
 //rotate the compost bin from 0 to 300 degrees, wait one second before rotating it back to it's original position
 void compost_bin(){
 
@@ -131,38 +128,31 @@ void compost_bin(){
         servo_arm.SetDegree(300);
         Sleep(1.0); 
         servo_arm.SetDegree(0);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-
     }; 
-}
-
+};
 //turn to 
 void turn_to_humidifier()
 {
+    int i=0;
+    while (i==0){
     float CdS = CdS_cell.Value();
 
     LCD.WriteLine("CdS Value:");
     LCD.WriteLine(CdS);
 
-    if (CdS <= red + 0.1)
-    {
+    if (CdS <= red + 1) {
         LCD.WriteLine("Red Light Detected");
-        turn_left(HALF_POWER, transitions_count(3));
-    } 
-    else if (CdS >= blue - 0.1) {
-        LCD.WriteLine("Blue Light Detected");
-        turn_right(HALF_POWER, transitions_count(3));
-    }
+            turn_left(HALF_POWER, transitions_count(3));
+            i=1;
+        } 
+    else if (CdS >= blue - 1) {
+            LCD.WriteLine("Blue Light Detected");
+            turn_right(HALF_POWER, transitions_count(3));
+            i=1;
+        }
     else {
-        LCD.WriteLine("No valid color detected");
-    }
-}
-=======
-    }
-}
->>>>>>> Stashed changes
-=======
-    }
-}
->>>>>>> Stashed changes
+            LCD.WriteLine("No valid color detected");
+            i=1;
+        }
+    };
+};
