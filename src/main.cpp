@@ -89,8 +89,8 @@ void turn_right(int percent, int counts)//Turn Right for a specified distance at
     left_encoder.ResetCounts();
 
     //Set both motors to desired percent
-    right_motor.SetPercent(percent);
-    left_motor.SetPercent(-percent);
+    right_motor.SetPercent(-percent);
+    left_motor.SetPercent(percent);
 
     //While the average of the left and right encoder is less than counts,
     //keep running motors
@@ -107,8 +107,8 @@ void turn_left(int percent, int counts) //Turn Left for a specified distance at 
     left_encoder.ResetCounts();
 
     //Set both motors to desired percent
-    right_motor.SetPercent(-percent);
-    left_motor.SetPercent(percent);
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(-percent);
 
     //While the average of the left and right encoder is less than counts,
     //keep running motors
@@ -134,6 +134,10 @@ void compost_bin(){
         servo_arm.SetDegree(300);
         Sleep(1.0); 
         servo_arm.SetDegree(0);
+<<<<<<< HEAD
+=======
+
+>>>>>>> de103d536a4221db931310398b5a2d773f79425e
     }; 
 };
 //turn to 
@@ -157,8 +161,14 @@ void turn_to_humidifier()
             i=1;
         }
     else {
+<<<<<<< HEAD
             LCD.WriteLine("No valid color detected");
             i=1;
         }
     };
 };
+=======
+        LCD.WriteLine("No valid color detected");
+    }
+}
+>>>>>>> de103d536a4221db931310398b5a2d773f79425e
