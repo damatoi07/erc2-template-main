@@ -10,10 +10,11 @@
 #define red 0.29 //Value for a red light with a red filter
 #define blue 1.93 //Value for a blue light with a red filter
 #define FULL_POWER 50.
+#define TURN_POWER 40.
 #define HALF_POWER 20.
 #define SERVO_INIT 500
 #define SERVO_FINAL 23858 
-#define turn_count 119 //Count input needed to make a 90 degree turn
+#define turn_count 250 //Count input needed to make a 90 degree turn
 
 
 //Declare Motors, Encoders & CdS Cell
@@ -40,7 +41,7 @@ void ERCMain()
     // {
         LCD.WriteLine("initiated");
         move_forward(FULL_POWER,(transitions_count(36)));
-        turn_left(FULL_POWER,turn_count);
+        turn_left(TURN_POWER,turn_count);
         move_forward(FULL_POWER,(transitions_count(18)));
     }
 // }
@@ -70,7 +71,7 @@ void move_forward(int percent, float counts) //Drive Forward for a specified dis
     left_encoder.ResetCounts();
 
     //Set both motors to desired percent
-    right_motor.SetPercent(percent);
+    right_motor.SetPercent(percent+2);
     left_motor.SetPercent(percent);
 
 
@@ -134,10 +135,6 @@ void compost_bin(){
         servo_arm.SetDegree(300);
         Sleep(1.0); 
         servo_arm.SetDegree(0);
-<<<<<<< HEAD
-=======
-
->>>>>>> de103d536a4221db931310398b5a2d773f79425e
     }; 
 };
 //turn to 
@@ -161,14 +158,8 @@ void turn_to_humidifier()
             i=1;
         }
     else {
-<<<<<<< HEAD
             LCD.WriteLine("No valid color detected");
             i=1;
         }
     };
 };
-=======
-        LCD.WriteLine("No valid color detected");
-    }
-}
->>>>>>> de103d536a4221db931310398b5a2d773f79425e
