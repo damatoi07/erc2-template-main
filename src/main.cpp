@@ -29,6 +29,7 @@ void turn_right(int percent, int counts);
 void turn_left(int percent, int counts); 
 float transitions_count (float s);
 void compost_bin();
+void turn_to_humidifier();
 
 void ERCMain()
 {
@@ -127,4 +128,26 @@ void compost_bin(){
         servo_arm.SetDegree(0);
 
     }; 
+}
+
+//turn to 
+void turn_to_humidifier()
+{
+    float CdS = CdS_cell.Value();
+
+    LCD.WriteLine("CdS Value:");
+    LCD.WriteLine(CdS);
+
+    if (CdS <= red + 0.1)
+    {
+        LCD.WriteLine("Red Light Detected");
+        turn_left(HALF_POWER, transitions_count(3));
+    } 
+    else if (CdS >= blue - 0.1) {
+        LCD.WriteLine("Blue Light Detected");
+        turn_right(HALF_POWER, transitions_count(3));
+    }
+    else {
+        LCD.WriteLine("No valid color detected");
+    }
 }
