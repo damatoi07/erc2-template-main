@@ -12,7 +12,8 @@
 #define FULL_POWER 50.
 #define HALF_POWER 20.
 #define SERVO_INIT 500
-#define SERVO_FINAL 23858
+#define SERVO_FINAL 23858 
+#define turn_count 119 //Count input needed to make a 90 degree turn
 
 
 //Declare Motors, Encoders & CdS Cell
@@ -20,7 +21,7 @@ FEHMotor left_motor(FEHMotor::Motor0,9.0);
 FEHMotor right_motor(FEHMotor::Motor3,9.0);
 DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
-AnalogInputPin CdS_cell(FEHIO::Pin3);
+AnalogInputPin CdS_cell(FEHIO::Pin14);
 FEHServo servo_arm(FEHServo::Servo7);
 
 int start(); 
@@ -34,14 +35,15 @@ void turn_to_humidifier();
 void ERCMain()
 { 
     int initiate=0;
-    LCD.WriteLine("initiate 0");
-    initiate = start();
-    if (initiate==1)
-    {
+    // initiate = start();
+    // if (initiate==1)
+    // {
         LCD.WriteLine("initiated");
-        move_forward(FULL_POWER,(transitions_count(2)));
+        move_forward(FULL_POWER,(transitions_count(36)));
+        turn_left(FULL_POWER,turn_count);
+        move_forward(FULL_POWER,(transitions_count(18)));
     }
-}
+// }
 int start ()//Go after start light is detected to be ON or after 30 seconds
 {
     int i=0;
@@ -50,7 +52,11 @@ int start ()//Go after start light is detected to be ON or after 30 seconds
     while (i==0)
     {
         float CdS = CdS_cell.Value();
-        if ((CdS <= (red+1))||((TimeNow()-start_time)>=3))
+        LCD.WriteLine(CdS);
+         Sleep(2.0);
+        LCD.Clear();
+        if ((CdS <= (red+1)))
+        // ||((TimeNow()-start_time)>=5))
         {
             i=1;
             return(1);
@@ -140,12 +146,12 @@ void turn_to_humidifier()
     LCD.WriteLine("CdS Value:");
     LCD.WriteLine(CdS);
 
-    if (CdS <= red + 1) {
+    if (CdS <= (red + 1)) {
         LCD.WriteLine("Red Light Detected");
             turn_left(HALF_POWER, transitions_count(3));
             i=1;
         } 
-    else if (CdS >= blue - 1) {
+    else if (CdS >= (blue - 1)) {
             LCD.WriteLine("Blue Light Detected");
             turn_right(HALF_POWER, transitions_count(3));
             i=1;
