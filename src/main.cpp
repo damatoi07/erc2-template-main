@@ -134,10 +134,6 @@ void compost_bin(){
         servo_arm.SetDegree(300);
         Sleep(1.0); 
         servo_arm.SetDegree(0);
-<<<<<<< HEAD
-=======
-
->>>>>>> de103d536a4221db931310398b5a2d773f79425e
     }; 
 };
 //turn to 
@@ -161,14 +157,8 @@ void turn_to_humidifier()
             i=1;
         }
     else {
-<<<<<<< HEAD
             LCD.WriteLine("No valid color detected");
             i=1;
         }
     };
 };
-=======
-        LCD.WriteLine("No valid color detected");
-    }
-}
->>>>>>> de103d536a4221db931310398b5a2d773f79425e
