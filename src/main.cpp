@@ -14,7 +14,8 @@
 #define HALF_POWER 20.
 #define SERVO_INIT 500
 #define SERVO_FINAL 23858 
-#define turn_count 250 //Count input needed to make a 90 degree turn
+#define turn_count_90 250 //Count input needed to make a 90 degree turn
+#define turn_count_45 125 //Count input needed to make a 25 degree turn
 
 
 //Declare Motors, Encoders & CdS Cell
@@ -36,15 +37,18 @@ void turn_to_humidifier();
 void ERCMain()
 { 
     int initiate=0;
-    // initiate = start();
-    // if (initiate==1)
-    // {
+    initiate = start();
+    if (initiate==1)
+    {
         LCD.WriteLine("initiated");
-        move_forward(FULL_POWER,(transitions_count(36)));
-        turn_left(TURN_POWER,turn_count);
-        move_forward(FULL_POWER,(transitions_count(18)));
+        move_forward(-FULL_POWER,(transitions_count(3)));
+        turn_right(TURN_POWER,turn_count_45);
+        move_forward(35.,(transitions_count(42)));
+        turn_left(TURN_POWER,turn_count_90);
+        move_forward(FULL_POWER,(transitions_count(16)));
+        turn_to_humidifier();
     }
-// }
+}
 int start ()//Go after start light is detected to be ON or after 30 seconds
 {
     int i=0;
@@ -149,12 +153,16 @@ void turn_to_humidifier()
 
     if (CdS <= (red + 1)) {
         LCD.WriteLine("Red Light Detected");
-            turn_left(HALF_POWER, transitions_count(3));
+            move_forward(FULL_POWER,(transitions_count(2)));
+            turn_right(TURN_POWER, 100);
+            move_forward(FULL_POWER,(transitions_count(3)));
             i=1;
         } 
     else if (CdS >= (blue - 1)) {
             LCD.WriteLine("Blue Light Detected");
-            turn_right(HALF_POWER, transitions_count(3));
+            move_forward(FULL_POWER,(transitions_count(2)));
+            turn_left(TURN_POWER, 100);
+            move_forward(FULL_POWER,(transitions_count(3)));
             i=1;
         }
     else {
