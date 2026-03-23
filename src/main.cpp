@@ -16,7 +16,9 @@
 #define SERVO_FINAL 23858 
 #define turn_count_90 255 //Count input needed to make a 90 degree turn
 #define turn_count_45 125 //Count input needed to make a 25 degree turn
-
+#define start_position 0 //Starting degree value for falling servo arm
+#define end_position 90 //Starting degree value for falling servo arm
+#define window_time 15 //Time for falling arm to be down
 
 //Declare Motors, Encoders & CdS Cell
 FEHMotor left_motor(FEHMotor::Motor0,9.0);
@@ -24,7 +26,8 @@ FEHMotor right_motor(FEHMotor::Motor3,9.0);
 DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 AnalogInputPin CdS_cell(FEHIO::Pin14);
-FEHServo servo_arm(FEHServo::Servo7);
+FEHServo servo_falling_arm(FEHServo::Servo6);
+
 
 int start(); 
 void move_forward(int percent, float counts);
@@ -33,6 +36,7 @@ void turn_left(int percent, int counts);
 float transitions_count (float s);
 void compost_bin();
 void turn_to_humidifier();
+void drop_falling_arm ();
 
 void ERCMain()
 { 
@@ -174,3 +178,11 @@ void turn_to_humidifier()
         }
     };
 };
+void drop_falling_arm()
+{
+    float StartTime=TimeNow;
+    servo_falling_arm.SetDegree(start_position);  
+    servo_falling_arm.SetDegree(end_position);
+    while ((TimeNow - StartTime) < window_time) {};
+    servo_falling_arm.SetDegree(start_position); 
+}
