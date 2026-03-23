@@ -194,10 +194,10 @@ void turn_to_humidifier()
 };
 void drop_falling_arm()
 {
-    float StartTime=TimeNow;
+    float StartTime=TimeNow();
     servo_falling_arm.SetDegree(start_position);  
     servo_falling_arm.SetDegree(end_position);
-    while ((TimeNow - StartTime) < window_time) {};
+    while ((TimeNow() - StartTime) < window_time) {};
     servo_falling_arm.SetDegree(start_position); 
 }
 
