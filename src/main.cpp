@@ -203,27 +203,7 @@ void follow_line(float speed){
 
     while (true)  { // I will follow this line forever! 
         switch(state){ // If I am in the middle of the line... 
-            case MIDDLE: 
-                while(state==MIDDLE){ // Set motor powers for driving straight 
-                    right_motor.SetPercent(speed);
-                    left_motor.SetPercent (speed); 
-                    
-                    //Check Values 
-                    right_val = right_opto.Value(); 
-                    left_val = left_opto.Value(); 
-                    middle_val = middle_opto.Value(); 
-
-                    if ((right_val >= (RON-1))) { 
-                        state = RIGHT; // update a new state 
-                    } 
-
-                    if ((left_val >= (LON-1))) { 
-                        state=LEFT; 
-                    } 
-
-                }; 
-                break; 
-
+            
             // If the right sensor is on the line... 
             case RIGHT: 
                 while(state==RIGHT) { 
