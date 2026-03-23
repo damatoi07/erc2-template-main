@@ -203,7 +203,7 @@ void follow_line(float speed){
 
     while (true)  { // I will follow this line forever! 
         switch(state){ // If I am in the middle of the line... 
-            
+
             // If the right sensor is on the line... 
             case RIGHT: 
                 while(state==RIGHT) { 
@@ -214,7 +214,6 @@ void follow_line(float speed){
                     //Check Values 
                     right_val = right_opto.Value(); 
                     left_val = left_opto.Value(); 
-                    middle_val = middle_opto.Value(); 
 
                     if((right_val<=(ROFF+1))) { 
                         state=MIDDLE; 
@@ -232,7 +231,6 @@ void follow_line(float speed){
                     //Check Values 
                     right_val = right_opto.Value(); 
                     left_val = left_opto.Value(); 
-                    middle_val = middle_opto.Value(); 
 
                     if((left_val<=(LOFF+1))) { 
                         state=MIDDLE; 
