@@ -14,8 +14,13 @@
 #define HALF_POWER 20.
 #define SERVO_INIT 500
 #define SERVO_FINAL 23858 
-#define turn_count_90 250 //Count input needed to make a 90 degree turn
+#define turn_count_90 255 //Count input needed to make a 90 degree turn
 #define turn_count_45 125 //Count input needed to make a 25 degree turn
+<<<<<<< HEAD
+#define start_position 0 //Starting degree value for falling servo arm
+#define end_position 90 //Starting degree value for falling servo arm
+#define window_time 15 //Time for falling arm to be down
+=======
 
 //line following variables
 #define RON 3.33 
@@ -25,6 +30,7 @@
 #define MON 3.43 
 #define MOFF 0.80 
 
+>>>>>>> b8d018de52c6288b6599d30f0320fd2184088f86
 
 //Declare Motors, Encoders & CdS Cell
 FEHMotor left_motor(FEHMotor::Motor0,9.0);
@@ -32,7 +38,8 @@ FEHMotor right_motor(FEHMotor::Motor3,9.0);
 DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 AnalogInputPin CdS_cell(FEHIO::Pin14);
-FEHServo servo_arm(FEHServo::Servo7);
+FEHServo servo_falling_arm(FEHServo::Servo6);
+
 
 AnalogInputPin right_opto(FEHIO::Pin2); 
 AnalogInputPin middle_opto(FEHIO::Pin3); 
@@ -45,7 +52,11 @@ void turn_left(int percent, int counts);
 float transitions_count (float s);
 void compost_bin();
 void turn_to_humidifier();
+<<<<<<< HEAD
+void drop_falling_arm ();
+=======
 void follow_line(float speed);
+>>>>>>> b8d018de52c6288b6599d30f0320fd2184088f86
 
 void ERCMain()
 { 
@@ -54,13 +65,18 @@ void ERCMain()
     if (initiate==1)
     {
         LCD.WriteLine("initiated");
-        move_forward(-FULL_POWER,(transitions_count(3)));
+        move_forward(-FULL_POWER,(transitions_count(4)));
         turn_right(TURN_POWER,turn_count_45);
-        move_forward(35.,(transitions_count(42)));
+        move_forward(35.,(transitions_count(40.25)));
         turn_left(TURN_POWER,turn_count_90);
-        move_forward(FULL_POWER,(transitions_count(16)));
+        move_forward(FULL_POWER,(transitions_count(14.5)));
         turn_to_humidifier();
+        move_forward(-FULL_POWER,(transitions_count(18))); 
+        turn_left(-TURN_POWER,turn_count_90);
+        move_forward(-35.,(transitions_count(45)));
+        turn_right(-TURN_POWER,turn_count_45);
     }
+
 }
 int start ()//Go after start light is detected to be ON or after 30 seconds
 {
@@ -71,7 +87,6 @@ int start ()//Go after start light is detected to be ON or after 30 seconds
     {
         float CdS = CdS_cell.Value();
         LCD.WriteLine(CdS);
-         Sleep(2.0);
         LCD.Clear();
         if ((CdS <= (red+1)))
         // ||((TimeNow()-start_time)>=5))
@@ -160,30 +175,38 @@ void turn_to_humidifier()
     int i=0;
     while (i==0){
     float CdS = CdS_cell.Value();
-
     LCD.WriteLine("CdS Value:");
     LCD.WriteLine(CdS);
 
-    if (CdS <= (red + 1)) {
+    if (CdS <= (red + .82)) {
         LCD.WriteLine("Red Light Detected");
+            turn_right(TURN_POWER, 50);
             move_forward(FULL_POWER,(transitions_count(2)));
-            turn_right(TURN_POWER, 100);
-            move_forward(FULL_POWER,(transitions_count(3)));
             i=1;
+            turn_right(TURN_POWER, 50);
         } 
-    else if (CdS >= (blue - 1)) {
+    else if ((CdS > (blue - .82)) && (CdS < 2.5)) {
             LCD.WriteLine("Blue Light Detected");
+            turn_left(TURN_POWER, 50);
             move_forward(FULL_POWER,(transitions_count(2)));
-            turn_left(TURN_POWER, 100);
-            move_forward(FULL_POWER,(transitions_count(3)));
             i=1;
+            turn_left(-TURN_POWER, 50);
         }
     else {
             LCD.WriteLine("No valid color detected");
-            i=1;
+            move_forward(FULL_POWER,(transitions_count(0.5)));
         }
     };
 };
+<<<<<<< HEAD
+void drop_falling_arm()
+{
+    float StartTime=TimeNow;
+    servo_falling_arm.SetDegree(start_position);  
+    servo_falling_arm.SetDegree(end_position);
+    while ((TimeNow - StartTime) < window_time) {};
+    servo_falling_arm.SetDegree(start_position); 
+=======
 
 enum LineStates { 
     MIDDLE, 
@@ -224,4 +247,5 @@ void follow_line(float speed){
 
         Sleep(1);
     }
+>>>>>>> b8d018de52c6288b6599d30f0320fd2184088f86
 }
