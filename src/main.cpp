@@ -16,11 +16,9 @@
 #define SERVO_FINAL 23858 
 #define turn_count_90 255 //Count input needed to make a 90 degree turn
 #define turn_count_45 125 //Count input needed to make a 25 degree turn
-<<<<<<< HEAD
 #define start_position 0 //Starting degree value for falling servo arm
 #define end_position 90 //Starting degree value for falling servo arm
 #define window_time 15 //Time for falling arm to be down
-=======
 
 //line following variables
 #define RON 3.33 
@@ -30,7 +28,6 @@
 #define MON 3.43 
 #define MOFF 0.80 
 
->>>>>>> b8d018de52c6288b6599d30f0320fd2184088f86
 
 //Declare Motors, Encoders & CdS Cell
 FEHMotor left_motor(FEHMotor::Motor0,9.0);
@@ -52,11 +49,8 @@ void turn_left(int percent, int counts);
 float transitions_count (float s);
 void compost_bin();
 void turn_to_humidifier();
-<<<<<<< HEAD
 void drop_falling_arm ();
-=======
 void follow_line(float speed);
->>>>>>> b8d018de52c6288b6599d30f0320fd2184088f86
 
 void ERCMain()
 { 
@@ -198,7 +192,6 @@ void turn_to_humidifier()
         }
     };
 };
-<<<<<<< HEAD
 void drop_falling_arm()
 {
     float StartTime=TimeNow;
@@ -206,16 +199,9 @@ void drop_falling_arm()
     servo_falling_arm.SetDegree(end_position);
     while ((TimeNow - StartTime) < window_time) {};
     servo_falling_arm.SetDegree(start_position); 
-=======
-
-enum LineStates { 
-    MIDDLE, 
-    RIGHT, 
-    LEFT,  
-}; 
+}
 
 void follow_line(float speed){
-
     while (true){
 
         float right_val = right_opto.Value(); 
@@ -225,27 +211,27 @@ void follow_line(float speed){
         bool right_on = (right_val > ROFF);
         bool left_on  = (left_val  > LOFF);
 
-        //Turn Left
         if (left_on && !right_on){
+            // Turn LEFT
             right_motor.SetPercent(speed);
             left_motor.SetPercent(speed * 0.5);
         }
-        //Turn right
         else if (right_on && !left_on){
+            // Turn RIGHT
             right_motor.SetPercent(speed * 0.5);
             left_motor.SetPercent(speed);
         }
-        //Go straight
         else if (!left_on && !right_on){
+            // Go STRAIGHT
             right_motor.SetPercent(speed);
             left_motor.SetPercent(speed);
         }
         else {
+            // Both see line → probably lost or intersection
             right_motor.Stop();
             left_motor.Stop();
         }
 
-        Sleep(1);
+        Sleep(0.05);
     }
->>>>>>> b8d018de52c6288b6599d30f0320fd2184088f86
 }
