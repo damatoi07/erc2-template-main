@@ -193,54 +193,35 @@ enum LineStates {
 
 void follow_line(float speed){
 
-    int state = MIDDLE;
+    while (true){
 
-    //read the value of the Optos and store in x 
+        float right_val = right_opto.Value(); 
+        float left_val = left_opto.Value(); 
 
-    float right_val = right_opto.Value(); 
-    float left_val = left_opto.Value(); 
-    float middle_val = middle_opto.Value(); 
+        // Adjust based on your threshold
+        bool right_on = (right_val > ROFF);
+        bool left_on  = (left_val  > LOFF);
 
-    while (true)  { // I will follow this line forever! 
-        switch(state){ // If I am in the middle of the line... 
+        //Turn Left
+        if (left_on && !right_on){
+            right_motor.SetPercent(speed);
+            left_motor.SetPercent(speed * 0.5);
+        }
+        //Turn right
+        else if (right_on && !left_on){
+            right_motor.SetPercent(speed * 0.5);
+            left_motor.SetPercent(speed);
+        }
+        //Go straight
+        else if (!left_on && !right_on){
+            right_motor.SetPercent(speed);
+            left_motor.SetPercent(speed);
+        }
+        else {
+            right_motor.Stop();
+            left_motor.Stop();
+        }
 
-            // If the right sensor is on the line... 
-            case RIGHT: 
-                while(state==RIGHT) { 
-                    // Set motor powers for right turn 
-                    right_motor.SetPercent(speed*(8/5)); 
-                    left_motor.SetPercent (speed*(4/5)); 
-
-                    //Check Values 
-                    right_val = right_opto.Value(); 
-                    left_val = left_opto.Value(); 
-
-                    if((right_val<=(ROFF+1))) { 
-                        state=MIDDLE; 
-                    } 
-                }; 
-                break; 
-
-            // If the left sensor is on the line... 
-            case LEFT: 
-                while(state==LEFT) { 
-                /* Mirror operation of RIGHT state */ 
-                    right_motor.SetPercent(speed*(4/5)); 
-                    left_motor.SetPercent(speed*(8/5)); 
-
-                    //Check Values 
-                    right_val = right_opto.Value(); 
-                    left_val = left_opto.Value(); 
-
-                    if((left_val<=(LOFF+1))) { 
-                        state=MIDDLE; 
-                    } 
-                }; 
-                break; 
-            default: right_motor.Stop(); left_motor.Stop(); 
-            break; 
-
-        } 
-        Sleep(1); 
+        Sleep(1);
     }
 }
