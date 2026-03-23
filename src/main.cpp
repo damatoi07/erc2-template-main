@@ -211,27 +211,25 @@ void follow_line(float speed){
         bool right_on = (right_val > ROFF);
         bool left_on  = (left_val  > LOFF);
 
+        //Turn left
         if (left_on && !right_on){
-            // Turn LEFT
             right_motor.SetPercent(speed);
             left_motor.SetPercent(speed * 0.5);
         }
+        //Turn right
         else if (right_on && !left_on){
-            // Turn RIGHT
             right_motor.SetPercent(speed * 0.5);
             left_motor.SetPercent(speed);
         }
+        //Go straight
         else if (!left_on && !right_on){
-            // Go STRAIGHT
             right_motor.SetPercent(speed);
             left_motor.SetPercent(speed);
         }
         else {
-            // Both see line → probably lost or intersection
             right_motor.Stop();
             left_motor.Stop();
         }
-
-        Sleep(0.05);
+        Sleep(1);
     }
 }
