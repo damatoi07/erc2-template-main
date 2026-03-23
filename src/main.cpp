@@ -16,9 +16,21 @@
 #define SERVO_FINAL 23858 
 #define turn_count_90 255 //Count input needed to make a 90 degree turn
 #define turn_count_45 125 //Count input needed to make a 25 degree turn
+<<<<<<< HEAD
 #define start_position 0 //Starting degree value for falling servo arm
 #define end_position 90 //Starting degree value for falling servo arm
 #define window_time 15 //Time for falling arm to be down
+=======
+
+//line following variables
+#define RON 3.33 
+#define ROFF .53 
+#define LON 3.69 
+#define LOFF 1.15 
+#define MON 3.43 
+#define MOFF 0.80 
+
+>>>>>>> b8d018de52c6288b6599d30f0320fd2184088f86
 
 //Declare Motors, Encoders & CdS Cell
 FEHMotor left_motor(FEHMotor::Motor0,9.0);
@@ -29,6 +41,10 @@ AnalogInputPin CdS_cell(FEHIO::Pin14);
 FEHServo servo_falling_arm(FEHServo::Servo6);
 
 
+AnalogInputPin right_opto(FEHIO::Pin2); 
+AnalogInputPin middle_opto(FEHIO::Pin3); 
+AnalogInputPin left_opto(FEHIO::Pin4); 
+
 int start(); 
 void move_forward(int percent, float counts);
 void turn_right(int percent, int counts);
@@ -36,7 +52,11 @@ void turn_left(int percent, int counts);
 float transitions_count (float s);
 void compost_bin();
 void turn_to_humidifier();
+<<<<<<< HEAD
 void drop_falling_arm ();
+=======
+void follow_line(float speed);
+>>>>>>> b8d018de52c6288b6599d30f0320fd2184088f86
 
 void ERCMain()
 { 
@@ -178,6 +198,7 @@ void turn_to_humidifier()
         }
     };
 };
+<<<<<<< HEAD
 void drop_falling_arm()
 {
     float StartTime=TimeNow;
@@ -185,4 +206,87 @@ void drop_falling_arm()
     servo_falling_arm.SetDegree(end_position);
     while ((TimeNow - StartTime) < window_time) {};
     servo_falling_arm.SetDegree(start_position); 
+=======
+
+enum LineStates { 
+    MIDDLE, 
+    RIGHT, 
+    LEFT,  
+}; 
+
+void follow_line(float speed){
+
+    int state = MIDDLE;
+
+    //read the value of the Optos and store in x 
+
+    float right_val = right_opto.Value(); 
+    float left_val = left_opto.Value(); 
+    float middle_val = middle_opto.Value(); 
+
+    while (true)  { // I will follow this line forever! 
+        switch(state){ // If I am in the middle of the line... 
+            case MIDDLE: 
+                while(state==MIDDLE){ // Set motor powers for driving straight 
+                    right_motor.SetPercent(speed);
+                    left_motor.SetPercent (speed); 
+                    
+                    //Check Values 
+                    right_val = right_opto.Value(); 
+                    left_val = left_opto.Value(); 
+                    middle_val = middle_opto.Value(); 
+
+                    if ((right_val >= (RON-1))) { 
+                        state = RIGHT; // update a new state 
+                    } 
+
+                    if ((left_val >= (LON-1))) { 
+                        state=LEFT; 
+                    } 
+
+                }; 
+                break; 
+
+            // If the right sensor is on the line... 
+            case RIGHT: 
+                while(state==RIGHT) { 
+                    // Set motor powers for right turn 
+                    right_motor.SetPercent(speed*(8/5)); 
+                    left_motor.SetPercent (speed*(4/5)); 
+
+                    //Check Values 
+                    right_val = right_opto.Value(); 
+                    left_val = left_opto.Value(); 
+                    middle_val = middle_opto.Value(); 
+
+                    if((right_val<=(ROFF+1))) { 
+                        state=MIDDLE; 
+                    } 
+                }; 
+                break; 
+
+            // If the left sensor is on the line... 
+            case LEFT: 
+                while(state==LEFT) { 
+                /* Mirror operation of RIGHT state */ 
+                    right_motor.SetPercent(speed*(4/5)); 
+                    left_motor.SetPercent(speed*(8/5)); 
+
+                    //Check Values 
+                    right_val = right_opto.Value(); 
+                    left_val = left_opto.Value(); 
+                    middle_val = middle_opto.Value(); 
+
+                    if((left_val<=(LOFF+1))) { 
+                        state=MIDDLE; 
+                    } 
+                }; 
+                break; 
+            default: right_motor.Stop(); left_motor.Stop(); 
+            break; 
+
+        } 
+        Sleep(1); 
+    }
+>>>>>>> b8d018de52c6288b6599d30f0320fd2184088f86
 }
