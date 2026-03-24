@@ -38,8 +38,8 @@ AnalogInputPin CdS_cell(FEHIO::Pin14);
 FEHServo servo_falling_arm(FEHServo::Servo6);
 
 
-AnalogInputPin right_opto(FEHIO::Pin2); 
-AnalogInputPin middle_opto(FEHIO::Pin3); 
+AnalogInputPin right_opto(FEHIO::Pin5); 
+//AnalogInputPin middle_opto(FEHIO::Pin3); 
 AnalogInputPin left_opto(FEHIO::Pin4); 
 
 int start(); 
@@ -152,15 +152,15 @@ float transitions_count (float s)//Calculate the number of transitions the encod
 //rotate the compost bin from 0 to 300 degrees, wait one second before rotating it back to it's original position
 void compost_bin(){
 
-    servo_arm.SetMin(SERVO_INIT); 
-    servo_arm.SetMax(SERVO_FINAL); 
+    servo_falling_arm.SetMin(SERVO_INIT); 
+    servo_falling_arm.SetMax(SERVO_FINAL); 
 
     int i=1; 
     while (i==1) { 
-        servo_arm.SetDegree(0); 
-        servo_arm.SetDegree(300);
+        servo_falling_arm.SetDegree(0); 
+        servo_falling_arm.SetDegree(300);
         Sleep(1.0); 
-        servo_arm.SetDegree(0);
+        servo_falling_arm.SetDegree(0);
     }; 
 };
 //turn to 
@@ -207,7 +207,6 @@ void follow_line(float speed){
         float right_val = right_opto.Value(); 
         float left_val = left_opto.Value(); 
 
-        // Adjust based on your threshold
         bool right_on = (right_val > ROFF);
         bool left_on  = (left_val  > LOFF);
 
