@@ -16,17 +16,11 @@
 #define SERVO_FINAL 23858 
 #define turn_count_90 255 //Count input needed to make a 90 degree turn
 #define turn_count_45 125 //Count input needed to make a 25 degree turn
-#define start_position 0 //Starting degree value for falling servo arm
-#define end_position 90 //Starting degree value for falling servo arm
-#define window_time 15 //Time for falling arm to be down
-
-//line following variables
-#define RON 3.33 
-#define ROFF .53 
-#define LON 3.69 
-#define LOFF 1.15 
-#define MON 3.43 
-#define MOFF 0.80 
+#define UP 0.0 //Starting degree value for falling servo arm
+#define DOWN 90.0 //Starting degree value for falling servo arm
+#define HALF 45.0
+#define SERVO_MIN 500
+#define SERVO_MAX 23858 
 
 
 //Declare Motors, Encoders & CdS Cell
@@ -35,12 +29,8 @@ FEHMotor right_motor(FEHMotor::Motor3,9.0);
 DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 AnalogInputPin CdS_cell(FEHIO::Pin14);
-FEHServo servo_falling_arm(FEHServo::Servo6);
+FEHServo servo_falling_arm(FEHServo::Servo0);
 
-
-AnalogInputPin right_opto(FEHIO::Pin5); 
-//AnalogInputPin middle_opto(FEHIO::Pin3); 
-AnalogInputPin left_opto(FEHIO::Pin4); 
 
 int start(); 
 void move_forward(int percent, float counts);
@@ -49,28 +39,27 @@ void turn_left(int percent, int counts);
 float transitions_count (float s);
 void compost_bin();
 void turn_to_humidifier();
-void drop_falling_arm ();
-void follow_line(float speed);
+void move_falling_arm (float position);
+
 
 void ERCMain()
 { 
-    int initiate=0;
-    initiate = start();
-    if (initiate==1)
-    {
-        LCD.WriteLine("initiated");
-        move_forward(-FULL_POWER,(transitions_count(4)));
-        turn_right(TURN_POWER,turn_count_45);
-        move_forward(35.,(transitions_count(40.25)));
-        turn_left(TURN_POWER,turn_count_90);
-        move_forward(FULL_POWER,(transitions_count(14.5)));
-        turn_to_humidifier();
-        move_forward(-FULL_POWER,(transitions_count(18))); 
-        turn_left(-TURN_POWER,turn_count_90);
-        move_forward(-35.,(transitions_count(45)));
-        turn_right(-TURN_POWER,turn_count_45);
-    }
-
+    LCD.WriteLine("initiated");
+    move_falling_arm(UP);
+    move_falling_arm(DOWN);
+    // int initiate=0;
+    // initiate = start();
+    // if (initiate==1)
+    // {
+    //     LCD.WriteLine("initiated");
+    //     move_forward(-FULL_POWER,(transitions_count(4)));
+    //     turn_right(TURN_POWER,turn_count_45);
+    //     move_forward(35.,(transitions_count(40.25)));
+    //     turn_left(TURN_POWER,turn_count_90);
+    //     move_forward(FULL_POWER,(transitions_count(18)));
+    //     turn_to_humidifier();
+    //     move_forward(-FULL_POWER,(transitions_count(18))); 
+    // }
 }
 int start ()//Go after start light is detected to be ON or after 30 seconds
 {
@@ -152,16 +141,16 @@ float transitions_count (float s)//Calculate the number of transitions the encod
 //rotate the compost bin from 0 to 300 degrees, wait one second before rotating it back to it's original position
 void compost_bin(){
 
-    servo_falling_arm.SetMin(SERVO_INIT); 
-    servo_falling_arm.SetMax(SERVO_FINAL); 
+    // servo_arm.SetMin(SERVO_INIT); 
+    // servo_arm.SetMax(SERVO_FINAL); 
 
-    int i=1; 
-    while (i==1) { 
-        servo_falling_arm.SetDegree(0); 
-        servo_falling_arm.SetDegree(300);
-        Sleep(1.0); 
-        servo_falling_arm.SetDegree(0);
-    }; 
+    // int i=1; 
+    // while (i==1) { 
+    //     servo_arm.SetDegree(0); 
+    //     servo_arm.SetDegree(300);
+    //     Sleep(1.0); 
+    //     servo_arm.SetDegree(0);
+    // }; 
 };
 //turn to 
 void turn_to_humidifier()
@@ -192,43 +181,11 @@ void turn_to_humidifier()
         }
     };
 };
-void drop_falling_arm()
+void move_falling_arm(float position)
 {
-    float StartTime=TimeNow();
-    servo_falling_arm.SetDegree(start_position);  
-    servo_falling_arm.SetDegree(end_position);
-    while ((TimeNow() - StartTime) < window_time) {};
-    servo_falling_arm.SetDegree(start_position); 
-}
-
-void follow_line(float speed){
-    while (true){
-
-        float right_val = right_opto.Value(); 
-        float left_val = left_opto.Value(); 
-
-        bool right_on = (right_val > ROFF);
-        bool left_on  = (left_val  > LOFF);
-
-        //Turn left
-        if (left_on && !right_on){
-            right_motor.SetPercent(speed);
-            left_motor.SetPercent(speed * 0.5);
-        }
-        //Turn right
-        else if (right_on && !left_on){
-            right_motor.SetPercent(speed * 0.5);
-            left_motor.SetPercent(speed);
-        }
-        //Go straight
-        else if (!left_on && !right_on){
-            right_motor.SetPercent(speed);
-            left_motor.SetPercent(speed);
-        }
-        else {
-            right_motor.Stop();
-            left_motor.Stop();
-        }
-        Sleep(1);
-    }
-}
+    LCD.WriteLine(position); 
+    servo_falling_arm.SetMin(SERVO_MIN);
+    servo_falling_arm.SetMax(SERVO_MAX);
+    servo_falling_arm.SetDegree(position/5.0); 
+    Sleep(5.0);
+};
