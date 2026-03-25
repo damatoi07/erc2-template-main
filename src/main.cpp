@@ -21,6 +21,10 @@
 #define HALF 45.0
 #define SERVO_MIN 500
 #define SERVO_MAX 23858 
+#define DOWN_Percentage 20  //Falling arm percentage for going down
+#define UP_Percentage -30 //Falling arm percentage for going up
+#define DOWN 0
+#define UP 1
 
 
 //Declare Motors, Encoders & CdS Cell
@@ -29,7 +33,7 @@ FEHMotor right_motor(FEHMotor::Motor3,9.0);
 DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 AnalogInputPin CdS_cell(FEHIO::Pin14);
-FEHServo servo_falling_arm(FEHServo::Servo0);
+FEHMotor falling_arm_motor(FEHMotor::Motor1, 9.0);
 
 
 int start(); 
@@ -39,27 +43,29 @@ void turn_left(int percent, int counts);
 float transitions_count (float s);
 void compost_bin();
 void turn_to_humidifier();
-void move_falling_arm (float position);
+void move_falling_arm (int percent);
 
 
 void ERCMain()
 { 
     LCD.WriteLine("initiated");
-    move_falling_arm(UP);
-    move_falling_arm(DOWN);
-    // int initiate=0;
-    // initiate = start();
-    // if (initiate==1)
-    // {
-    //     LCD.WriteLine("initiated");
-    //     move_forward(-FULL_POWER,(transitions_count(4)));
-    //     turn_right(TURN_POWER,turn_count_45);
-    //     move_forward(35.,(transitions_count(40.25)));
-    //     turn_left(TURN_POWER,turn_count_90);
-    //     move_forward(FULL_POWER,(transitions_count(18)));
-    //     turn_to_humidifier();
-    //     move_forward(-FULL_POWER,(transitions_count(18))); 
-    // }
+    int initiate=0;
+    initiate = start();
+    if (initiate==1)
+    {
+        LCD.WriteLine("initiated");
+        move_forward(-FULL_POWER,(transitions_count(4)));
+        turn_right(TURN_POWER,turn_count_45);
+        move_forward(35.,(transitions_count(40.25)));
+        turn_left(TURN_POWER,turn_count_90);
+        move_forward(FULL_POWER,(transitions_count(5)));
+        move_falling_arm(DOWN);
+        move_forward(FULL_POWER,(transitions_count(13)));
+        move_falling_arm(UP);
+        Sleep(0.5);
+        move_falling_arm(DOWN);
+        move_forward(-FULL_POWER,(transitions_count(18))); 
+    }
 }
 int start ()//Go after start light is detected to be ON or after 30 seconds
 {
@@ -181,11 +187,21 @@ void turn_to_humidifier()
         }
     };
 };
-void move_falling_arm(float position)
+void move_falling_arm(int position)
 {
-    LCD.WriteLine(position); 
-    servo_falling_arm.SetMin(SERVO_MIN);
-    servo_falling_arm.SetMax(SERVO_MAX);
-    servo_falling_arm.SetDegree(position/5.0); 
-    Sleep(5.0);
+    switch (position){
+        case (UP):
+        LCD.WriteLine("UP"); 
+        falling_arm_motor.SetPercent(UP_Percentage);
+        Sleep (0.5);
+        falling_arm_motor.Stop();
+        break;
+
+        case (DOWN):
+        LCD.WriteLine("DOWN"); 
+        falling_arm_motor.SetPercent(DOWN_Percentage);
+        Sleep (0.25);
+        falling_arm_motor.Stop();
+        break;
+    }
 };
