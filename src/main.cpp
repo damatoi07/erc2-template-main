@@ -44,6 +44,8 @@ float transitions_count (float s);
 void compost_bin();
 void turn_to_humidifier();
 void move_falling_arm (int percent);
+void pick_up_basket();
+void flip_fertilizer();
 
 
 void ERCMain()
