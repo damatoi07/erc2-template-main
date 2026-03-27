@@ -207,3 +207,9 @@ void move_falling_arm(int position)
         break;
     }
 };
+void pick_up_basket(){
+
+}
+void flip_fertilizer(){
+    
+}
