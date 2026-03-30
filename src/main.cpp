@@ -4,6 +4,7 @@
 #include <FEHUtility.h>
 #include <FEHServo.h>
 #include <FEHMotor.h>
+#include <FEHRCS.h>
 
 #define N 318 //Count of the IGWAN Motor
 #define r 2.5/2 //Radius of Wheels
@@ -14,8 +15,8 @@
 #define HALF_POWER 20.
 #define SERVO_INIT 500
 #define SERVO_FINAL 23858 
-#define turn_count_90 255 //Count input needed to make a 90 degree turn
-#define turn_count_45 125 //Count input needed to make a 25 degree turn
+#define turn_count_90 280 //Count input needed to make a 90 degree turn
+#define turn_count_45 130 //Count input needed to make a 45 degree turn
 #define UP 0.0 //Starting degree value for falling servo arm
 #define DOWN 90.0 //Starting degree value for falling servo arm
 #define HALF 45.0
@@ -55,16 +56,19 @@ void ERCMain()
     {
         LCD.WriteLine("initiated");
         move_forward(-FULL_POWER,(transitions_count(4)));
-        turn_right(TURN_POWER,turn_count_45);
-        move_forward(35.,(transitions_count(40.25)));
-        turn_left(TURN_POWER,turn_count_90);
-        move_forward(FULL_POWER,(transitions_count(5)));
-        move_falling_arm(DOWN);
-        move_forward(FULL_POWER,(transitions_count(13)));
-        move_falling_arm(UP);
-        Sleep(0.5);
-        move_falling_arm(DOWN);
-        move_forward(-FULL_POWER,(transitions_count(18))); 
+        move_forward(35.,(transitions_count(24)));
+        turn_right(TURN_POWER,(turn_count_90+turn_count_45));
+        move_forward(-35.,(transitions_count(40.25)));
+        move_forward(FULL_POWER,(transitions_count(20)));
+        move_forward(-FULL_POWER,(transitions_count(20)));
+        // turn_left(TURN_POWER,turn_count_90);
+        // move_falling_arm(DOWN);5
+        // move_forward(-FULL_POWER,(transitions_count(15)));
+        // move_forward(FULL_POWER,(transitions_count(24)));
+        // move_falling_arm(UP);
+        // move_forward(FULL_POWER,(transitions_count(2)));
+        // move_falling_arm(DOWN);
+        // move_forward(-FULL_POWER,(transitions_count(20))); 
     }
 }
 int start ()//Go after start light is detected to be ON or after 30 seconds
@@ -136,6 +140,8 @@ void turn_left(int percent, int counts) //Turn Left for a specified distance at 
     //keep running motors
     while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts);
 
+        LCD.WriteLine(left_encoder.Counts());
+        LCD.WriteLine(right_encoder.Counts());
     //Turn off motors
     right_motor.Stop();
     left_motor.Stop();
@@ -193,15 +199,19 @@ void move_falling_arm(int position)
         case (UP):
         LCD.WriteLine("UP"); 
         falling_arm_motor.SetPercent(UP_Percentage);
-        Sleep (0.5);
+        Sleep (0.3);
         falling_arm_motor.Stop();
         break;
 
         case (DOWN):
         LCD.WriteLine("DOWN"); 
         falling_arm_motor.SetPercent(DOWN_Percentage);
-        Sleep (0.25);
+        Sleep (0.225);
         falling_arm_motor.Stop();
         break;
     }
 };
+void RCS_heading_check (){
+    RCS.RequestPosition(false);
+
+}
