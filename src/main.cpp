@@ -35,6 +35,7 @@ DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 AnalogInputPin CdS_cell(FEHIO::Pin14);
 FEHMotor falling_arm_motor(FEHMotor::Motor1, 9.0);
+FEHMotor apple_motor(FEHMotor::Motor2, 9.0);
 
 
 int start(); 
@@ -45,6 +46,8 @@ float transitions_count (float s);
 void compost_bin();
 void turn_to_humidifier();
 void move_falling_arm (int percent);
+void pick_up_basket(int position);
+void flip_fertilizer();
 
 
 void ERCMain()
