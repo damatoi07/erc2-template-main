@@ -5,6 +5,7 @@
 #include <FEHServo.h>
 #include <FEHMotor.h>
 #include <FEHRCS.h>
+#include <FEHSD.h>
 
 #define N 318 //Count of the IGWAN Motor
 #define r 2.5/2 //Radius of Wheels
@@ -17,15 +18,20 @@
 #define SERVO_FINAL 23858 
 #define turn_count_90 280 //Count input needed to make a 90 degree turn
 #define turn_count_45 130 //Count input needed to make a 45 degree turn
-#define UP 0.0 //Starting degree value for falling servo arm
-#define DOWN 90.0 //Starting degree value for falling servo arm
+#define UP 0 //Starting degree value for falling servo arm
+#define DOWN 90 //Starting degree value for falling servo arm
 #define HALF 45.0
 #define SERVO_MIN 500
 #define SERVO_MAX 23858 
 #define DOWN_Percentage 20  //Falling arm percentage for going down
 #define UP_Percentage -30 //Falling arm percentage for going up
-#define DOWN 0
-#define UP 1
+#define DOWN_Percentage_Lever 15  //Lever arm percentage for going down
+#define UP_Percentage_Lever -15 //Lever arm percentage for going up
+#define RCS_WAIT_TIME_IN_SEC 0.35 //RCS Delay Time
+#define PULSE_TIME 0.1
+#define PULSE_POWER 25
+#define PLUS 0 // Orientation of AruCo Code
+#define MINUS 1 // Orientation of AruCo Code
 
 
 //Declare Motors, Encoders & CdS Cell
@@ -35,7 +41,7 @@ DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9);
 AnalogInputPin CdS_cell(FEHIO::Pin14);
 FEHMotor falling_arm_motor(FEHMotor::Motor1, 9.0);
-FEHMotor apple_motor(FEHMotor::Motor2, 9.0);
+FEHMotor lever_arm_motor (FEHMotor::Motor2, 9.0);
 
 
 int start(); 
@@ -48,32 +54,13 @@ void turn_to_humidifier();
 void move_falling_arm (int percent);
 void pick_up_basket(int position);
 void flip_fertilizer();
+void RCS_heading_check ();
+void check_x(float x_coordinate, int orientation);
+void check_y(float x_coordinate, int orientation);
+void pulse_forward(int percent, float seconds);
+void pulse_counterclockwise(int percent, float seconds);
 
 
-void ERCMain()
-{ 
-    LCD.WriteLine("initiated");
-    int initiate=0;
-    initiate = start();
-    if (initiate==1)
-    {
-        LCD.WriteLine("initiated");
-        move_forward(-FULL_POWER,(transitions_count(4)));
-        move_forward(35.,(transitions_count(24)));
-        turn_right(TURN_POWER,(turn_count_90+turn_count_45));
-        move_forward(-35.,(transitions_count(40.25)));
-        move_forward(FULL_POWER,(transitions_count(20)));
-        move_forward(-FULL_POWER,(transitions_count(20)));
-        // turn_left(TURN_POWER,turn_count_90);
-        // move_falling_arm(DOWN);5
-        // move_forward(-FULL_POWER,(transitions_count(15)));
-        // move_forward(FULL_POWER,(transitions_count(24)));
-        // move_falling_arm(UP);
-        // move_forward(FULL_POWER,(transitions_count(2)));
-        // move_falling_arm(DOWN);
-        // move_forward(-FULL_POWER,(transitions_count(20))); 
-    }
-}
 int start ()//Go after start light is detected to be ON or after 30 seconds
 {
     int i=0;
@@ -153,8 +140,7 @@ float transitions_count (float s)//Calculate the number of transitions the encod
 {
     return ((s*N)/(2*PI*r));
 };
-//rotate the compost bin from 0 to 300 degrees, wait one second before rotating it back to it's original position
-void compost_bin(){
+void compost_bin(){ //rotate the compost bin from 0 to 300 degrees, wait one second before rotating it back to it's original position
 
     // servo_arm.SetMin(SERVO_INIT); 
     // servo_arm.SetMax(SERVO_FINAL); 
@@ -167,7 +153,6 @@ void compost_bin(){
     //     servo_arm.SetDegree(0);
     // }; 
 };
-//turn to 
 void turn_to_humidifier()
 {
     int i=0;
@@ -196,6 +181,23 @@ void turn_to_humidifier()
         }
     };
 };
+void lever_arm(int position){
+    switch (position){
+        case (UP):
+        LCD.WriteLine("UP"); 
+        lever_arm_motor.SetPercent(UP_Percentage_Lever);
+        Sleep (0.3);
+        lever_arm_motor.Stop();
+        break;
+
+        case (DOWN):
+        LCD.WriteLine("DOWN"); 
+        lever_arm_motor.SetPercent(DOWN_Percentage_Lever);
+        Sleep (0.225);
+        lever_arm_motor.Stop();
+        break;
+    }
+};
 void move_falling_arm(int position)
 {
     switch (position){
@@ -203,18 +205,107 @@ void move_falling_arm(int position)
         LCD.WriteLine("UP"); 
         falling_arm_motor.SetPercent(UP_Percentage);
         Sleep (0.3);
-        falling_arm_motor.Stop();
+        lever_arm_motor.Stop();
         break;
 
         case (DOWN):
         LCD.WriteLine("DOWN"); 
         falling_arm_motor.SetPercent(DOWN_Percentage);
-        Sleep (0.225);
-        falling_arm_motor.Stop();
+        Sleep (0.25);
+        lever_arm_motor.Stop();
         break;
     }
 };
-void RCS_heading_check (){
-    RCS.RequestPosition(false);
 
+void RCS_heading_check (){
+    RCSPose* pose = RCS.Position();
+    if (pose != nullptr){
+
+    }
+};
+void check_x(float x_coordinate, int orientation){
+    
+    // Determine the direction of the motors based on the orientation of the AruCo code 
+    int power = PULSE_POWER;
+    if(orientation == MINUS){
+        power = -PULSE_POWER;
+    }
+
+    RCSPose* pose = RCS.RequestPosition();
+
+    // Check if receiving proper RCS coordinates and whether the robot is within an acceptable range
+    for (int i = 0; i < 10; i++) {
+        if(pose->x != -1 && (pose->x < x_coordinate - 1 || pose->x > x_coordinate + 1))
+        {
+            if(pose->x > x_coordinate + 1)
+            {
+                // Pulse the motors for a short duration in the correct direction
+                pulse_forward(-power, PULSE_TIME);
+            }
+            else if(pose->x < x_coordinate - 1)
+            {
+                // Pulse the motors for a short duration in the correct direction
+                pulse_forward(power, PULSE_TIME);
+            }
+            Sleep(RCS_WAIT_TIME_IN_SEC);
+
+            pose = RCS.RequestPosition();
+        }
+    }
+};
+void check_y(float y_coordinate, int orientation)
+{
+    // Determine the direction of the motors based on the orientation of the QR code
+    int power = PULSE_POWER;
+    if(orientation == MINUS){
+        power = -PULSE_POWER;
+    }
+
+    RCSPose* pose = RCS.RequestPosition();
+
+    // Check if receiving proper RCS coordinates and whether the robot is within an acceptable range
+    for (int i = 0; i < 10; i++) {
+        while(pose->y != -1 && (pose->y < y_coordinate - 1 || pose->y > y_coordinate + 1))
+        {
+            if(pose->y > (y_coordinate + 1))
+            {
+                // Pulse the motors for a short duration in the correct direction
+                pulse_forward(-power, PULSE_TIME);
+            }
+            else if(pose->y < (y_coordinate - 1))
+            {
+                // Pulse the motors for a short duration in the correct direction
+            pulse_forward(power, PULSE_TIME);
+            }
+            Sleep(RCS_WAIT_TIME_IN_SEC);
+            
+            pose = RCS.RequestPosition();
+        }
+    }   
+};
+void pulse_forward(int percent, float seconds) 
+{
+    // Set both motors to desired percent
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(percent);
+
+    // Wait for the correct number of seconds
+    Sleep(seconds);
+
+    // Turn off motors
+    right_motor.Stop();
+    left_motor.Stop();
 }
+void pulse_counterclockwise(int percent, float seconds) 
+{
+    // Set both motors to desired percent
+    right_motor.SetPercent(percent);
+    left_motor.SetPercent(-percent);
+
+    // Wait for the correct number of seconds
+    Sleep(seconds);
+
+    // Turn off motors
+    right_motor.Stop();
+    left_motor.Stop();
+};
