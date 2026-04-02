@@ -16,8 +16,8 @@
 #define HALF_POWER 20.
 #define SERVO_INIT 500
 #define SERVO_FINAL 23858 
-#define turn_count_90 280 //Count input needed to make a 90 degree turn
-#define turn_count_45 130 //Count input needed to make a 45 degree turn
+#define turn_count_90 245 //Count input needed to make a 90 degree turn
+#define turn_count_45 100 //Count input needed to make a 45 degree turn
 #define UP 0 //Starting degree value for falling servo arm
 #define DOWN 90 //Starting degree value for falling servo arm
 #define HALF 45.0
@@ -25,11 +25,12 @@
 #define SERVO_MAX 23858 
 #define DOWN_Percentage 20  //Falling arm percentage for going down
 #define UP_Percentage -30 //Falling arm percentage for going up
-#define DOWN_Percentage_Lever 15  //Lever arm percentage for going down
-#define UP_Percentage_Lever -15 //Lever arm percentage for going up
+#define DOWN_Percentage_Lever -15  //Lever arm percentage for going down
+#define UP_Percentage_Lever 50 //Lever arm percentage for going up
 #define RCS_WAIT_TIME_IN_SEC 0.35 //RCS Delay Time
-#define PULSE_TIME 0.1
+#define PULSE_TIME 0.17
 #define PULSE_POWER 25
+#define PULSE_COUNT 10 //Turn count for heading check
 #define PLUS 0 // Orientation of AruCo Code
 #define MINUS 1 // Orientation of AruCo Code
 
@@ -52,14 +53,46 @@ float transitions_count (float s);
 void compost_bin();
 void turn_to_humidifier();
 void move_falling_arm (int percent);
-void pick_up_basket(int position);
+void lever_arm(int position);
 void flip_fertilizer();
 void RCS_heading_check ();
 void check_x(float x_coordinate, int orientation);
 void check_y(float x_coordinate, int orientation);
 void pulse_forward(int percent, float seconds);
 void pulse_counterclockwise(int percent, float seconds);
+void RCS_heading_check (int heading_angle);
 
+void ERCMain()
+{
+    //Apple Bucket to Bottom of Ramp
+    move_forward(-FULL_POWER,(transitions_count(4)));
+    move_forward(FULL_POWER,(transitions_count(18)));
+    turn_left(TURN_POWER,turn_count_45);
+    move_forward(FULL_POWER,(transitions_count(6.75)));
+    lever_arm(UP);
+    move_forward(-FULL_POWER,(transitions_count(6)));
+    turn_left(TURN_POWER,(turn_count_90+turn_count_90));
+    move_forward(FULL_POWER,(transitions_count(25)));
+    turn_left(TURN_POWER,(turn_count_90+turn_count_45));
+
+    //Bottom Of Ramp to Crate
+    move_forward(FULL_POWER,(transitions_count(27)));
+    turn_left(TURN_POWER,turn_count_90);
+    move_forward(FULL_POWER,(transitions_count(6)));
+    turn_right(TURN_POWER,turn_count_90);
+    move_forward(FULL_POWER,(transitions_count(17.5)));
+    lever_arm(DOWN);
+    move_forward(-FULL_POWER,(transitions_count(17.5)));
+
+    //Crate to Levers
+    turn_left(TURN_POWER,turn_count_90);
+    move_forward(-FULL_POWER,(transitions_count(4)));
+    turn_left(TURN_POWER,turn_count_45);
+    move_forward(FULL_POWER,(transitions_count(12)));
+
+
+
+}
 
 int start ()//Go after start light is detected to be ON or after 30 seconds
 {
@@ -71,14 +104,13 @@ int start ()//Go after start light is detected to be ON or after 30 seconds
         float CdS = CdS_cell.Value();
         LCD.WriteLine(CdS);
         LCD.Clear();
-        if ((CdS <= (red+1)))
-        // ||((TimeNow()-start_time)>=5))
+        if (((CdS <= (red+1)))||((TimeNow()-start_time)>=5))
         {
             i=1;
             return(1);
         }
     };
-}
+};
 void move_forward(int percent, float counts) //Drive Forward for a specified distance at a specified speed using encoders
 {
     //Reset encoder counts
@@ -186,18 +218,39 @@ void lever_arm(int position){
         case (UP):
         LCD.WriteLine("UP"); 
         lever_arm_motor.SetPercent(UP_Percentage_Lever);
-        Sleep (0.3);
-        lever_arm_motor.Stop();
         break;
 
         case (DOWN):
+        lever_arm_motor.Stop();
         LCD.WriteLine("DOWN"); 
         lever_arm_motor.SetPercent(DOWN_Percentage_Lever);
-        Sleep (0.225);
+        Sleep (0.35);
         lever_arm_motor.Stop();
         break;
     }
 };
+void flip_correct_lever(){
+    int lever = RCS.GetLever();
+    switch(lever){
+        case(0):
+        turn_left(TURN_POWER, 100);
+        move_forward(FULL_POWER,(transitions_count(2)));
+        lever_arm(UP);
+        break;
+
+        case(1):
+        move_forward(FULL_POWER,(transitions_count(5)));
+        lever_arm(UP);
+        break;
+
+        case(2):
+        turn_right(TURN_POWER, 100);
+        move_forward(FULL_POWER,(transitions_count(2)));
+        lever_arm(UP);
+        break;
+
+    }
+}
 void move_falling_arm(int position)
 {
     switch (position){
@@ -216,11 +269,26 @@ void move_falling_arm(int position)
         break;
     }
 };
-
-void RCS_heading_check (){
+void RCS_heading_check (int heading_angle){
+    RCS.RequestPosition(false);
+    Sleep(0.1);
     RCSPose* pose = RCS.Position();
-    if (pose != nullptr){
 
+    for (int i = 0; i < 10; i++) {
+        if(pose->heading != heading_angle && (pose->heading < heading_angle - 1 || pose->heading > heading_angle + 1))
+        {
+            if(pose->heading > heading_angle + 1)
+            {
+                turn_right(PULSE_POWER,PULSE_COUNT);
+            }
+            else if(pose->heading < heading_angle - 1)
+            {
+                turn_left(PULSE_POWER,PULSE_COUNT);
+            }
+            Sleep(RCS_WAIT_TIME_IN_SEC);
+
+            pose = RCS.RequestPosition();
+        }
     }
 };
 void check_x(float x_coordinate, int orientation){
