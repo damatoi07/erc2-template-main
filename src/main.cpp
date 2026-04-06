@@ -43,6 +43,7 @@ DigitalEncoder left_encoder(FEHIO::Pin9);
 AnalogInputPin CdS_cell(FEHIO::Pin14);
 FEHMotor falling_arm_motor(FEHMotor::Motor1, 9.0);
 FEHMotor lever_arm_motor (FEHMotor::Motor2, 9.0);
+FEHServo compost_rotator (FEHServo::Servo7);
 
 
 int start(); 
@@ -174,16 +175,37 @@ float transitions_count (float s)//Calculate the number of transitions the encod
 };
 void compost_bin(){ //rotate the compost bin from 0 to 300 degrees, wait one second before rotating it back to it's original position
 
-    // servo_arm.SetMin(SERVO_INIT); 
-    // servo_arm.SetMax(SERVO_FINAL); 
 
-    // int i=1; 
-    // while (i==1) { 
-    //     servo_arm.SetDegree(0); 
-    //     servo_arm.SetDegree(300);
-    //     Sleep(1.0); 
-    //     servo_arm.SetDegree(0);
-    // }; 
+    compost_rotator.SetDegree(0); 
+    Sleep(3.0); //temporary guess
+    compost_rotator.SetDegree(90);
+
+    /*test run
+
+    float rotateTime = 2.0; //this will need testing: (time it takes for 1 rev)*300/360
+
+    compost_rotator.SetDegree(90); //set the initial point
+    Sleep(0.5);
+
+    //move 300 degrees
+    compost_rotator.SetDegree(0); 
+    Sleep(rotateTime); 
+
+    //stopping point
+    compost_rotator.SetDegree(90); 
+    Sleep(1.0);
+
+    //rotate back to original position
+    compost_rotator.SetDegree(180); 
+    Sleep(rotateTime);
+
+    //stop at the original position
+    compost_rotator.SetDegree(90); 
+
+    Sleep(0.5);
+    
+    */
+   
 };
 void turn_to_humidifier()
 {
