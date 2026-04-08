@@ -140,6 +140,7 @@ void ERCMain()
     }
 
     */
+
    Sleep(2.0);
    compost_bin();
     
@@ -231,8 +232,9 @@ void compost_bin(){ //rotate the compost bin from 0 to 300 degrees, wait one sec
 
 
     compost_rotator.SetDegree(0); 
-    Sleep(3.0); //temporary guess
+    Sleep(2.0); //temporary guess
     compost_rotator.SetDegree(90);
+    Sleep(2.0);
 
     /*test run
 
