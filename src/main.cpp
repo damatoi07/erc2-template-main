@@ -143,16 +143,17 @@ void ERCMain()
 
     //Start Light to Compost Bin
 
-    /*
+    start();
     move_forward(-FULL_POWER,(transitions_count(4)));
-    move_forward(FULL_POWER,(transitions_count(14)));
+    move_forward(FULL_POWER,(transitions_count(15)));
     turn_right(TURN_POWER,turn_count_45);
     move_forward(-FULL_POWER,(transitions_count(15)));
     move_forward(FULL_POWER,(transitions_count(1)));
-
-    */
     Sleep(2.0);
     compost_bin();
+    move_forward(FULL_POWER,(transitions_count(15)));
+    turn_left(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER,(transitions_count(17)));
     
     
 }
@@ -247,27 +248,20 @@ void compost_bin(){ //rotate the compost bin from 0 to 300 degrees, wait one sec
     Sleep(2.0);
     */
 
-    float rotateTime = 0.41; //this will need testing: (time it takes for 1 rev)*300/360
+    float rotateTime = 2.0; //this will need testing
 
-    compost_rotator.SetDegree(90); //set the initial point
+    //compost_rotator.SetDegree(90); //set the initial point
     Sleep(0.5);
 
     //move 300 degrees
-    compost_rotator.SetDegree(0); 
+    compost_rotator.SetDegree(180); 
     Sleep(rotateTime); 
 
-    //stopping point
-    compost_rotator.SetDegree(90); 
-    Sleep(1.0);
-
     //rotate back to original position
-    compost_rotator.SetDegree(180); 
+    compost_rotator.SetDegree(0); 
     Sleep(rotateTime);
 
-    //stop at the original position
-    compost_rotator.SetDegree(90); 
-
-    Sleep(0.5);
+    compost_rotator.Off();
    
 };
 int check_humidifier(){
