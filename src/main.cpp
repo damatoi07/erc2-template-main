@@ -39,8 +39,6 @@ FEHMotor right_motor(FEHMotor::Motor3,9.0); //IGWAN
 DigitalEncoder right_encoder(FEHIO::Pin8); 
 DigitalEncoder left_encoder(FEHIO::Pin9); 
 AnalogInputPin CdS_cell(FEHIO::Pin14);
-FEHMotor falling_arm_motor(FEHMotor::Motor1, 9.0);
-FEHMotor lever_arm_motor (FEHMotor::Motor2, 9.0);
 FEHServo compost_rotator (FEHServo::Servo7);
 FEHMotor falling_arm_motor(FEHMotor::Motor1, 9.0); //TT Motor
 FEHMotor lever_arm_motor (FEHMotor::Motor2, 9.0); //TT Motor
@@ -53,7 +51,8 @@ void turn_right(int percent, int counts);
 void turn_left(int percent, int counts); 
 float transitions_count (float s);
 void compost_bin();
-void turn_to_humidifier();
+int check_humidifier();
+void turn_to_humidifier (int light_color);
 void move_falling_arm (int percent);
 void lever_arm(int position);
 void lever_arm_start();
@@ -98,28 +97,44 @@ int initiate=start();
     move_forward(FULL_POWER,(transitions_count(20)));
     lever_arm(DOWN);
     
-    //Crate to Levers
+    //Crate to Humidifier Light
     move_forward(-FULL_POWER,(transitions_count(17.25)));
-    lever_arm(UP);
+    turn_left(TURN_POWER,turn_count_45);
+    move_falling_arm(DOWN);
+    move_forward(FULL_POWER,(transitions_count(10)));
+    Sleep(5.0); //Check Humidifier Light Position 
+    int light_color = check_humidifier();
+    move_forward(FULL_POWER,(transitions_count(5))); 
+    move_falling_arm(UP);
+    turn_to_humidifier(light_color); //Test Code with Lever Arm
+    move_falling_arm(DOWN);
+
+    //Humidifier Light to Levers
+    move_forward(-FULL_POWER,(transitions_count(15)));
+    move_falling_arm(UP);
     turn_left(TURN_POWER,turn_count_45);
     move_forward(FULL_POWER,(transitions_count(17)));
-    Sleep(1.0); 
+    Sleep(3.0); //Check position for levers
     lever_arm(DOWN);
     move_forward(-FULL_POWER,(transitions_count(5))); 
     move_forward(FULL_POWER,(transitions_count(5))); 
     lever_arm(UP);
 
-    //Levers to humidifier light
-    move_forward(-FULL_POWER,(transitions_count(17)));
+    //Levers to Top of Ramp
+    move_forward(-FULL_POWER,(transitions_count(28)));
+    turn_right(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER,(transitions_count(45)));
+
+    //Bottom of Ramp to Compost
+    turn_right(TURN_POWER,turn_count_45); 
+    move_forward(-FULL_POWER,(transitions_count(15)));
     turn_left(TURN_POWER,turn_count_45);
-    move_falling_arm(DOWN);
-    move_forward(FULL_POWER,(transitions_count(8.5)));
-    Sleep(3.0); //Check Humidifier Light Position
-    move_falling_arm(UP);
-    turn_to_humidifier();
-    move_falling_arm(DOWN);
-    move_forward(-FULL_POWER,(transitions_count(18))); 
-    Sleep(3.0);
+    move_forward(-FULL_POWER,(transitions_count(5)));
+    move_forward(FULL_POWER,(transitions_count(5)));
+    turn_right(TURN_POWER,turn_count_90); 
+    move_forward(-FULL_POWER,(transitions_count(5)));
+    Sleep(3.0); //Check compost position
+    compost_bin();
     }
 }
 
@@ -157,25 +172,6 @@ void move_forward(int percent, float counts) //Drive Forward for a specified dis
 
         LCD.WriteLine(left_encoder.Counts());
         LCD.WriteLine(right_encoder.Counts());
-
-    //Turn off motors
-    right_motor.Stop();
-    left_motor.Stop();
-};
-void up_ramp (int percent, float counts) //Drive Forward for a specified distance at a specified speed using encoders
-{
-    //Reset encoder counts
-    right_encoder.ResetCounts();
-    left_encoder.ResetCounts();
-
-    //Set both motors to desired percent
-    right_motor.SetPercent(percent+15);
-    left_motor.SetPercent(percent);
-
-
-    //While the average of the left and right encoder is less than counts,
-    //keep running motors
-    while((left_encoder.Counts() + right_encoder.Counts()) / 2. < counts);
 
     //Turn off motors
     right_motor.Stop();
@@ -257,7 +253,29 @@ void compost_bin(){ //rotate the compost bin from 0 to 300 degrees, wait one sec
     */
    
 };
-void turn_to_humidifier()
+int check_humidifier(){
+    
+    int i=0;
+    while (i==0){
+    float CdS = CdS_cell.Value();
+    LCD.WriteLine("CdS Value:");
+    LCD.WriteLine(CdS);
+
+    if (CdS <= (red + .82)) {
+        LCD.WriteLine("Red Light Detected");
+        return(i=0);
+        } 
+    else if ((CdS > (blue - .82)) && (CdS < 2.5)) {
+        LCD.WriteLine("Blue Light Detected");
+        return(i=1);
+        }
+    else {
+        LCD.WriteLine("No valid color detected");
+        move_forward(HALF_POWER,(transitions_count(0.5)));
+        }
+    }
+}
+void turn_to_humidifier(int light)
 {
     int i=0;
     while (i==0){
@@ -304,7 +322,7 @@ void lever_arm(int position){
 void lever_arm_start(){
         LCD.WriteLine("DOWN"); 
         lever_arm_motor.SetPercent(-10);
-        Sleep (.45);
+        Sleep (.25);
         lever_arm_motor.Stop();
 };
 void flip_correct_lever(){
