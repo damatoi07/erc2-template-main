@@ -65,7 +65,9 @@ void RCS_heading_check (int heading_angle);
 
 void ERCMain()
 {
-int initiate=start();
+    /*
+
+    int initiate=start();
     if (initiate==1){
 
     //Apple Bucket to Top of Ramp
@@ -136,6 +138,12 @@ int initiate=start();
     Sleep(3.0); //Check compost position
     compost_bin();
     }
+
+    */
+   Sleep(2.0);
+   compost_bin();
+    
+    
 }
 
 int start ()//Go after start light is detected to be ON or after 30 seconds
