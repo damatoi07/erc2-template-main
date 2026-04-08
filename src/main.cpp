@@ -142,7 +142,6 @@ void ERCMain()
     */
 
     //Start Light to Compost Bin
-
     start();
     move_forward(-FULL_POWER,(transitions_count(4)));
     move_forward(FULL_POWER,(transitions_count(15)));
@@ -241,19 +240,10 @@ float transitions_count (float s)//Calculate the number of transitions the encod
 };
 void compost_bin(){ //rotate the compost bin from 0 to 300 degrees, wait one second before rotating it back to it's original position
 
-    /*
-    compost_rotator.SetDegree(0); 
-    Sleep(2.0); //temporary guess
-    compost_rotator.SetDegree(90);
-    Sleep(2.0);
-    */
-
     float rotateTime = 2.0; //this will need testing
-
-    //compost_rotator.SetDegree(90); //set the initial point
     Sleep(0.5);
 
-    //move 300 degrees
+    //rotate clockwise
     compost_rotator.SetDegree(180); 
     Sleep(rotateTime); 
 
