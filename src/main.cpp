@@ -65,8 +65,6 @@ void RCS_heading_check (int heading_angle);
 
 void ERCMain()
 {
-    /*
-
     int initiate=start();
     if (initiate==1){
 
@@ -111,50 +109,33 @@ void ERCMain()
     turn_to_humidifier(light_color); //Test Code with Lever Arm
     move_falling_arm(DOWN);
 
-    //Humidifier Light to Levers
-    move_forward(-FULL_POWER,(transitions_count(15)));
-    move_falling_arm(UP);
-    turn_left(TURN_POWER,turn_count_45);
-    move_forward(FULL_POWER,(transitions_count(17)));
-    Sleep(3.0); //Check position for levers
-    lever_arm(DOWN);
-    move_forward(-FULL_POWER,(transitions_count(5))); 
-    move_forward(FULL_POWER,(transitions_count(5))); 
-    lever_arm(UP);
+    // //Humidifier Light to Levers
+    // move_forward(-FULL_POWER,(transitions_count(15)));
+    // move_falling_arm(UP);
+    // turn_left(TURN_POWER,turn_count_45);
+    // move_forward(FULL_POWER,(transitions_count(17)));
+    // Sleep(3.0); //Check position for levers
+    // lever_arm(DOWN);
+    // move_forward(-FULL_POWER,(transitions_count(5))); 
+    // move_forward(FULL_POWER,(transitions_count(5))); 
+    // lever_arm(UP);
 
-    //Levers to Top of Ramp
-    move_forward(-FULL_POWER,(transitions_count(28)));
-    turn_right(TURN_POWER,turn_count_45);
-    move_forward(-FULL_POWER,(transitions_count(45)));
+    // //Levers to Top of Ramp
+    // move_forward(-FULL_POWER,(transitions_count(28)));
+    // turn_right(TURN_POWER,turn_count_45);
+    // move_forward(-FULL_POWER,(transitions_count(45)));
 
-    //Bottom of Ramp to Compost
-    turn_right(TURN_POWER,turn_count_45); 
-    move_forward(-FULL_POWER,(transitions_count(15)));
-    turn_left(TURN_POWER,turn_count_45);
-    move_forward(-FULL_POWER,(transitions_count(5)));
-    move_forward(FULL_POWER,(transitions_count(5)));
-    turn_right(TURN_POWER,turn_count_90); 
-    move_forward(-FULL_POWER,(transitions_count(5)));
-    Sleep(3.0); //Check compost position
-    compost_bin();
+    // //Bottom of Ramp to Compost
+    // turn_right(TURN_POWER,turn_count_45); 
+    // move_forward(-FULL_POWER,(transitions_count(15)));
+    // turn_left(TURN_POWER,turn_count_45);
+    // move_forward(-FULL_POWER,(transitions_count(5)));
+    // move_forward(FULL_POWER,(transitions_count(5)));
+    // turn_right(TURN_POWER,turn_count_90); 
+    // move_forward(-FULL_POWER,(transitions_count(5)));
+    // Sleep(3.0); //Check compost position
+    // compost_bin();
     }
-
-    */
-
-    //Start Light to Compost Bin
-    start();
-    move_forward(-FULL_POWER,(transitions_count(4)));
-    move_forward(FULL_POWER,(transitions_count(15)));
-    turn_right(TURN_POWER,turn_count_45);
-    move_forward(-FULL_POWER,(transitions_count(15)));
-    move_forward(FULL_POWER,(transitions_count(1)));
-    Sleep(2.0);
-    compost_bin();
-    move_forward(FULL_POWER,(transitions_count(15)));
-    turn_left(TURN_POWER,turn_count_45);
-    move_forward(-FULL_POWER,(transitions_count(17)));
-    
-    
 }
 
 int start ()//Go after start light is detected to be ON or after 30 seconds
@@ -240,18 +221,36 @@ float transitions_count (float s)//Calculate the number of transitions the encod
 };
 void compost_bin(){ //rotate the compost bin from 0 to 300 degrees, wait one second before rotating it back to it's original position
 
-    float rotateTime = 2.0; //this will need testing
+
+    compost_rotator.SetDegree(0); 
+    Sleep(3.0); //temporary guess
+    compost_rotator.SetDegree(90);
+
+    /*test run
+
+    float rotateTime = 2.0; //this will need testing: (time it takes for 1 rev)*300/360
+
+    compost_rotator.SetDegree(90); //set the initial point
     Sleep(0.5);
 
-    //rotate clockwise
-    compost_rotator.SetDegree(180); 
+    //move 300 degrees
+    compost_rotator.SetDegree(0); 
     Sleep(rotateTime); 
 
+    //stopping point
+    compost_rotator.SetDegree(90); 
+    Sleep(1.0);
+
     //rotate back to original position
-    compost_rotator.SetDegree(0); 
+    compost_rotator.SetDegree(180); 
     Sleep(rotateTime);
 
-    compost_rotator.Off();
+    //stop at the original position
+    compost_rotator.SetDegree(90); 
+
+    Sleep(0.5);
+    
+    */
    
 };
 int check_humidifier(){
@@ -323,7 +322,7 @@ void lever_arm(int position){
 void lever_arm_start(){
         LCD.WriteLine("DOWN"); 
         lever_arm_motor.SetPercent(-10);
-        Sleep (.25);
+        Sleep (.35);
         lever_arm_motor.Stop();
 };
 void flip_correct_lever(){
