@@ -25,7 +25,7 @@
 #define UP_Percentage -30 //Falling arm percentage for going up
 #define DOWN_Percentage_Lever -30  //Lever arm percentage for going down
 #define UP_Percentage_Lever 45 //Lever arm percentage for going up
-#define RCS_WAIT_TIME_IN_SEC 0.35 //RCS Delay Time
+#define RCS_WAIT_TIME_IN_SEC 1.0 //RCS Delay Time
 #define PULSE_TIME 0.17 //Time to pulse towards a direction to make corrections in position
 #define PULSE_POWER 25 //Power to the motors when pulsing towards a direction to make corrections in position
 #define PULSE_COUNT 10 //Turn count for heading check
@@ -61,18 +61,28 @@ void RCS_heading_check ();
 void check_x(float x_coordinate, int orientation);
 void check_y(float x_coordinate, int orientation);
 void pulse_forward(int percent, float seconds);
-void RCS_heading_check (int heading_angle);
+void RCS_heading_check (float heading_angle);
 
 void ERCMain()
 {
+    //initialize the RCS
+    RCS.InitializeTouchMenu("1130D7LFS");
+
+    //Store Coordinate values to RCS?
+
+    WaitForFinalAction();
+
     int initiate=start();
     if (initiate==1){
 
     //Apple Bucket to Top of Ramp
+    Sleep(0.5);
     lever_arm_start();
     move_forward(-FULL_POWER,(transitions_count(4)));
     move_forward(FULL_POWER,(transitions_count(18)));
     turn_left(TURN_POWER,turn_count_45);
+    RCS_heading_check(180.0);
+    Sleep(3.0);
     move_forward(FULL_POWER,(transitions_count(9)));
     lever_arm(UP);
     move_forward(-FULL_POWER,(transitions_count(9)));
@@ -80,12 +90,12 @@ void ERCMain()
     move_forward(-FULL_POWER,(transitions_count(8)));
     turn_left(TURN_POWER,turn_count_45);
     move_forward(-FULL_POWER,(transitions_count(10)));
-    move_forward(FULL_POWER,(transitions_count(3)));
+    move_forward(FULL_POWER,(transitions_count(2.25)));
     turn_right(TURN_POWER,turn_count_90);
     move_forward(RAMP_POWER,(transitions_count(45)));
 
     //Wall Alignment
-    move_forward(-FULL_POWER,(transitions_count(10)));
+    move_forward(-FULL_POWER,(transitions_count(8)));
     turn_left(TURN_POWER,(turn_count_45/2));
     move_forward(FULL_POWER,(transitions_count(8)));
     turn_left(TURN_POWER,(turn_count_45+(turn_count_45/2)));
@@ -99,15 +109,17 @@ void ERCMain()
     
     //Crate to Humidifier Light
     move_forward(-FULL_POWER,(transitions_count(17.25)));
-    turn_left(TURN_POWER,turn_count_45);
+    turn_left(TURN_POWER,turn_count_90);
+    RCS_heading_check(180.0);
+    Sleep(3.0);
     move_falling_arm(DOWN);
     move_forward(FULL_POWER,(transitions_count(10)));
     Sleep(5.0); //Check Humidifier Light Position 
     int light_color = check_humidifier();
-    move_forward(FULL_POWER,(transitions_count(5))); 
+    move_forward(FULL_POWER,(transitions_count(3)));
     move_falling_arm(UP);
     turn_to_humidifier(light_color); //Test Code with Lever Arm
-    move_falling_arm(DOWN);
+    //move_falling_arm(DOWN);
 
     // //Humidifier Light to Levers
     // move_forward(-FULL_POWER,(transitions_count(15)));
@@ -136,7 +148,7 @@ void ERCMain()
     // Sleep(3.0); //Check compost position
     // compost_bin();
     }
-}
+};
 
 int start ()//Go after start light is detected to be ON or after 30 seconds
 {
@@ -280,8 +292,8 @@ void turn_to_humidifier(int light)
     int i=0;
     while (i==0){
     float CdS = CdS_cell.Value();
-    LCD.WriteLine("CdS Value:");
-    LCD.WriteLine(CdS);
+    move_forward(-FULL_POWER,(transitions_count(3)));
+    lever_arm(DOWN);
 
     if (CdS <= (red + .82)) {
         LCD.WriteLine("Red Light Detected");
@@ -322,7 +334,7 @@ void lever_arm(int position){
 void lever_arm_start(){
         LCD.WriteLine("DOWN"); 
         lever_arm_motor.SetPercent(-10);
-        Sleep (.35);
+        Sleep (.45);
         lever_arm_motor.Stop();
 };
 void flip_correct_lever(){
@@ -365,25 +377,38 @@ void move_falling_arm(int position)
         break;
     }
 };
-void RCS_heading_check (int heading_angle){
+void RCS_heading_check (float heading_angle){
     RCS.RequestPosition(false);
-    Sleep(0.1);
+    Sleep(1.0);
     RCSPose* pose = RCS.Position();
     int i = 0;
+    int RIGHT_COUNT = PULSE_COUNT;
+     int LEFT_COUNT = PULSE_COUNT;
 
-        if(pose->heading != heading_angle && (((heading_angle + 1) < pose->heading < (heading_angle - 1)) && i !=5))
+    LCD.Clear();
+    LCD.WriteLine(pose->heading);
+
+        while(pose->heading != heading_angle && ((heading_angle - 1) < pose->heading < (heading_angle + 1)) && i !=5)
         {
             if(pose->heading > heading_angle + 1)
             {
-                turn_right(PULSE_POWER,PULSE_COUNT);
+                turn_right(PULSE_POWER,RIGHT_COUNT);
+                LEFT_COUNT=PULSE_COUNT-3;
             }
             else if(pose->heading < heading_angle - 1)
             {
-                turn_left(PULSE_POWER,PULSE_COUNT);
+                turn_left(PULSE_POWER,LEFT_COUNT);
+                RIGHT_COUNT=PULSE_COUNT-3;
             }
             Sleep(RCS_WAIT_TIME_IN_SEC);
 
-            pose = RCS.RequestPosition();
+            RCSPose* pose = RCS.RequestPosition();
+
+            i++;
+
+            LCD.WriteLine(pose->heading);
+
+            //Add if it pulses in one direction it pulses less in the other
     }
 };
 void check_x(float x_coordinate, int orientation){
