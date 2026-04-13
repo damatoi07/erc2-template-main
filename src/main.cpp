@@ -234,35 +234,18 @@ float transitions_count (float s)//Calculate the number of transitions the encod
 void compost_bin(){ //rotate the compost bin from 0 to 300 degrees, wait one second before rotating it back to it's original position
 
 
-    compost_rotator.SetDegree(0); 
-    Sleep(3.0); //temporary guess
-    compost_rotator.SetDegree(90);
-
-    /*test run
-
     float rotateTime = 2.0; //this will need testing: (time it takes for 1 rev)*300/360
-
-    compost_rotator.SetDegree(90); //set the initial point
     Sleep(0.5);
 
-    //move 300 degrees
-    compost_rotator.SetDegree(0); 
-    Sleep(rotateTime); 
-
-    //stopping point
-    compost_rotator.SetDegree(90); 
-    Sleep(1.0);
-
-    //rotate back to original position
+    //rotate clockwise
     compost_rotator.SetDegree(180); 
     Sleep(rotateTime);
 
-    //stop at the original position
-    compost_rotator.SetDegree(90); 
+    //rotate counterclockwise
+    compost_rotator.SetDegree(0); 
+    Sleep(rotateTime); 
 
     Sleep(0.5);
-    
-    */
    
 };
 int check_humidifier(){
