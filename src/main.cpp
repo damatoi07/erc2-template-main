@@ -108,16 +108,15 @@ void ERCMain()
     lever_arm(DOWN);
     
     //Crate to Humidifier Light
-    move_forward(-FULL_POWER,(transitions_count(17.25)));
+    move_forward(-FULL_POWER,(transitions_count(16.5)));
     turn_left(TURN_POWER,turn_count_90);
+    move_falling_arm(UP);
     RCS_heading_check(180.0);
     Sleep(3.0);
-    move_falling_arm(DOWN);
     move_forward(FULL_POWER,(transitions_count(10)));
     Sleep(5.0); //Check Humidifier Light Position 
     int light_color = check_humidifier();
     move_forward(FULL_POWER,(transitions_count(3)));
-    move_falling_arm(UP);
     turn_to_humidifier(light_color); //Test Code with Lever Arm
     //move_falling_arm(DOWN);
 
