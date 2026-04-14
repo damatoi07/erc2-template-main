@@ -65,6 +65,11 @@ void RCS_heading_check (float heading_angle);
 
 void ERCMain()
 {
+
+    //lever_arm_start();
+
+    
+        
     //initialize the RCS
     RCS.InitializeTouchMenu("1130D7LFS");
 
@@ -77,10 +82,10 @@ void ERCMain()
 
     //Apple Bucket to Top of Ramp
     Sleep(0.5);
-    lever_arm_start();
     move_forward(-FULL_POWER,(transitions_count(4)));
     move_forward(FULL_POWER,(transitions_count(18)));
     turn_left(TURN_POWER,turn_count_45);
+    lever_arm_start();
     RCS_heading_check(180.0);
     Sleep(3.0);
     move_forward(FULL_POWER,(transitions_count(9)));
@@ -108,7 +113,7 @@ void ERCMain()
     lever_arm(DOWN);
     
     //Crate to Humidifier Light
-    move_forward(-FULL_POWER,(transitions_count(16.5)));
+    move_forward(-FULL_POWER,(transitions_count(15)));
     turn_left(TURN_POWER,turn_count_90);
     move_falling_arm(UP);
     RCS_heading_check(180.0);
@@ -118,7 +123,7 @@ void ERCMain()
     int light_color = check_humidifier();
     move_forward(FULL_POWER,(transitions_count(3)));
     turn_to_humidifier(light_color); //Test Code with Lever Arm
-    //move_falling_arm(DOWN);
+    move_falling_arm(DOWN);
 
     // //Humidifier Light to Levers
     // move_forward(-FULL_POWER,(transitions_count(15)));
@@ -147,6 +152,8 @@ void ERCMain()
     // Sleep(3.0); //Check compost position
     // compost_bin();
     }
+    
+   
 };
 
 int start ()//Go after start light is detected to be ON or after 30 seconds
@@ -316,7 +323,8 @@ void lever_arm(int position){
 void lever_arm_start(){
         LCD.WriteLine("DOWN"); 
         lever_arm_motor.SetPercent(-10);
-        Sleep (.45);
+        lever_arm_motor.SetPercent(-10);
+        Sleep (0.5);
         lever_arm_motor.Stop();
 };
 void flip_correct_lever(){
@@ -384,8 +392,7 @@ void RCS_heading_check (float heading_angle){
             }
             Sleep(RCS_WAIT_TIME_IN_SEC);
 
-            RCSPose* pose = RCS.RequestPosition();
-
+            pose = RCS.RequestPosition();
             i++;
 
             LCD.WriteLine(pose->heading);
