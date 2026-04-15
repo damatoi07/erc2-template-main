@@ -132,13 +132,15 @@ void ERCMain()
     lever_arm(UP);
     RCS_heading_check(180.0);
     Sleep(3.0);
+    move_forward(FULL_POWER,(transitions_count(10)));
+    Sleep(3.0); //Check Humidifier Light Position 
     move_forward(FULL_POWER,(transitions_count(12)));
     Sleep(5.0); //Check Humidifier Light Position 
     int light_color = check_humidifier();
     move_forward(-FULL_POWER,(transitions_count(1.5)));
     turn_to_humidifier(light_color); //Test Code with Lever Arm
     lever_arm(DOWN);
-    //move_falling_arm(DOWN);
+    move_falling_arm(DOWN);
 
     // //Humidifier Light to Levers
     // move_forward(-FULL_POWER,(transitions_count(15)));
@@ -385,8 +387,7 @@ void move_falling_arm(int position)
 
         case (ON):
         LCD.WriteLine("ON & UP"); 
-        lever_arm_motor.SetPercent(UP_Percentage);
-        lever_arm_motor.SetPercent(UP_Percentage);
+        lever_arm_motor.SetPercent(UP_Percentage_Lever);
         break;
     }
 };
