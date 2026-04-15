@@ -67,26 +67,9 @@ void RCS_heading_check (float heading_angle);
 void ERCMain()
 {
     //initialize the RCS
-    RCS.InitializeTouchMenu("1130D7LFS");
+    RCS.InitializeTouchMenu("1130D7LFS"); 
 
-    //Store Coordinate values to RCS
-    int touch_x,touch_y;
-    float light_x, light_y, B_x, B_y, C_x, C_y, D_x, D_y;
-    float light_heading, B_heading, C_heading, D_heading;
-
-    LCD.WriteLine("RCS & Data Logging");
-    LCD.WriteLine("Press Screen To Start");
-    while(!LCD.Touch(&touch_x,&touch_y));
-    while(LCD.Touch(&touch_x,&touch_y));
-
-    FEHFile* fptr = SD.FOpen("RCS_TEST.txt", "r");
-    
-    SD.FScanf(fptr, "%f%f", &light_x, &light_y);
-    // SD.FScanf(fptr, "%f%f", &B_x, &B_y);
-    // SD.FScanf(fptr, "%f%f", &C_x, &C_y);
-    // SD.FScanf(fptr, "%f%f", &D_x, &D_y);
-
-    SD.FClose(fptr);
+   
 
     WaitForFinalAction();
 
@@ -113,7 +96,7 @@ void ERCMain()
     move_forward(RAMP_POWER,(transitions_count(45)));
 
     //Wall Alignment
-    move_forward(-FULL_POWER,(transitions_count(8)));
+    move_forward(-FULL_POWER,(transitions_count(8.5)));
     turn_left(TURN_POWER,(turn_count_45/2));
     move_forward(FULL_POWER,(transitions_count(8)));
     turn_left(TURN_POWER,(turn_count_45+(turn_count_45/2)));
@@ -126,9 +109,10 @@ void ERCMain()
     lever_arm(DOWN);
     
     //Crate to Humidifier Light
-    check_x(light_x, BACKWARDS);
-    // move_forward(-FULL_POWER,(transitions_count(14.5)));
+    // check_x(light_x, BACKWARDS);
+    move_forward(-FULL_POWER,(transitions_count(15.5)));
     turn_left(TURN_POWER,turn_count_90);
+    move_falling_arm(DOWN);
     lever_arm(UP);
     RCS_heading_check(180.0);
     Sleep(3.0);
@@ -137,10 +121,11 @@ void ERCMain()
     move_forward(FULL_POWER,(transitions_count(12)));
     Sleep(5.0); //Check Humidifier Light Position 
     int light_color = check_humidifier();
+    move_forward(FULL_POWER,(transitions_count(1)));
+    move_falling_arm(UP);
     move_forward(-FULL_POWER,(transitions_count(1.5)));
     turn_to_humidifier(light_color); //Test Code with Lever Arm
-    lever_arm(DOWN);
-    move_falling_arm(DOWN);
+    // move_falling_arm(DOWN);
 
     // //Humidifier Light to Levers
     // move_forward(-FULL_POWER,(transitions_count(15)));
@@ -341,7 +326,7 @@ void lever_arm_start(){
         LCD.WriteLine("DOWN"); 
         lever_arm_motor.SetPercent(-10);
         lever_arm_motor.SetPercent(-10);
-        Sleep (0.55);
+        Sleep (0.4);
         lever_arm_motor.Stop();
 };
 void flip_correct_lever(){
@@ -382,12 +367,13 @@ void move_falling_arm(int position)
         falling_arm_motor.SetPercent(DOWN_Percentage);
         falling_arm_motor.SetPercent(DOWN_Percentage);
         Sleep (0.25);
-        lever_arm_motor.Stop();
+        falling_arm_motor.Stop();
         break;
 
         case (ON):
         LCD.WriteLine("ON & UP"); 
-        lever_arm_motor.SetPercent(UP_Percentage_Lever);
+        falling_arm_motor.SetPercent(UP_Percentage);
+        falling_arm_motor.SetPercent(UP_Percentage);
         break;
     }
 };
