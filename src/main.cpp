@@ -125,7 +125,7 @@ void ERCMain()
     move_forward(-FULL_POWER,(transitions_count(1.5)));
     turn_to_humidifier(light_color); //Test Code with Lever Arm
     lever_arm(DOWN);
-    //move_falling_arm(DOWN);
+    move_falling_arm(DOWN);
 
     // //Humidifier Light to Levers
     // move_forward(-FULL_POWER,(transitions_count(15)));
