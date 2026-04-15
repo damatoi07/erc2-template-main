@@ -19,6 +19,7 @@
 #define turn_count_45 105 //Count input needed to make a 45 degree turn
 #define UP 0 //Starting degree value for falling arm
 #define DOWN 90 //Starting degree value for falling arm
+#define ON 3 //Value for case switch with falling arm
 // #define SERVO_MIN 500
 // #define SERVO_MAX 23858 
 #define DOWN_Percentage 20  //Falling arm percentage for going down
@@ -81,7 +82,6 @@ void ERCMain()
     if (initiate==1){
 
     //Apple Bucket to Top of Ramp
-    Sleep(0.5);
     move_forward(-FULL_POWER,(transitions_count(4)));
     move_forward(FULL_POWER,(transitions_count(18)));
     turn_left(TURN_POWER,turn_count_45);
@@ -97,7 +97,7 @@ void ERCMain()
     move_forward(-FULL_POWER,(transitions_count(10)));
     move_forward(FULL_POWER,(transitions_count(2.25)));
     turn_right(TURN_POWER,turn_count_90);
-    move_falling_arm(UP);
+    move_falling_arm(ON);
     move_forward(RAMP_POWER,(transitions_count(45)));
 
     //Wall Alignment
@@ -288,14 +288,14 @@ void turn_to_humidifier(int light)
 
     if (CdS <= (red + .82)) {
         LCD.WriteLine("Red Light Detected");
-            turn_right(TURN_POWER, 50);
+            turn_right(TURN_POWER, 95);
             move_forward(FULL_POWER,(transitions_count(2)));
             i=1;
             turn_right(TURN_POWER, 50);
         } 
     else if ((CdS > (blue - .82)) && (CdS < 2.5)) {
             LCD.WriteLine("Blue Light Detected");
-            turn_left(TURN_POWER, 50);
+            turn_left(TURN_POWER, turn_count_45);
             move_forward(FULL_POWER,(transitions_count(2)));
             i=1;
             turn_left(-TURN_POWER, 50);
@@ -366,6 +366,11 @@ void move_falling_arm(int position)
         falling_arm_motor.SetPercent(DOWN_Percentage);
         Sleep (0.25);
         lever_arm_motor.Stop();
+        break;
+
+        case (ON):
+        LCD.WriteLine("ON & UP"); 
+        lever_arm_motor.SetPercent(UP_Percentage_Lever);
         break;
     }
 };
