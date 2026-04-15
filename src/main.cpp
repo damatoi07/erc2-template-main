@@ -69,6 +69,29 @@ void ERCMain()
     //initialize the RCS
     RCS.InitializeTouchMenu("1130D7LFS"); 
 
+    //Store Coordinate values to RCS
+    int touch_x,touch_y;
+    float light_x, light_y, B_x, B_y, C_x, C_y, D_x, D_y;
+    float light_heading, B_heading, C_heading, D_heading;
+
+    LCD.WriteLine("RCS & Data Logging");
+    LCD.WriteLine("Press Screen To Start");
+    while(!LCD.Touch(&touch_x,&touch_y));
+    while(LCD.Touch(&touch_x,&touch_y));
+
+    FEHFile* fptr = SD.FOpen("RCS_TEST.txt", "r");
+    
+    SD.FScanf(fptr, "%f%f", &light_x, &light_y);
+    // SD.FScanf(fptr, "%f%f", &B_x, &B_y);
+    // SD.FScanf(fptr, "%f%f", &C_x, &C_y);
+    // SD.FScanf(fptr, "%f%f", &D_x, &D_y);
+
+    SD.FPrintf(fptr, "Light: %.2f, %.2f\n", light_x, light_y);
+    SD.FPrintf(fptr, "B: %.2f, %.2f\n", B_x, B_y);
+    SD.FPrintf(fptr, "C: %.2f, %.2f\n", C_x, C_y);
+    SD.FPrintf(fptr, "D: %.2f, %.2f\n", D_x, D_y);
+
+    SD.FClose(fptr);
    
 
     WaitForFinalAction();
