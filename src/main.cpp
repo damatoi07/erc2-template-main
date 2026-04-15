@@ -120,7 +120,7 @@ void ERCMain()
     RCS_heading_check(180.0);
     Sleep(3.0);
     move_forward(FULL_POWER,(transitions_count(10)));
-    Sleep(5.0); //Check Humidifier Light Position 
+    Sleep(3.0); //Check Humidifier Light Position 
     int light_color = check_humidifier();
     move_forward(-FULL_POWER,(transitions_count(1.5)));
     turn_to_humidifier(light_color); //Test Code with Lever Arm
