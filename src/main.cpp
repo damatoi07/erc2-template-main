@@ -97,6 +97,7 @@ void ERCMain()
     move_forward(-FULL_POWER,(transitions_count(10)));
     move_forward(FULL_POWER,(transitions_count(2.25)));
     turn_right(TURN_POWER,turn_count_90);
+    move_falling_arm(UP);
     move_forward(RAMP_POWER,(transitions_count(45)));
 
     //Wall Alignment
@@ -113,17 +114,18 @@ void ERCMain()
     lever_arm(DOWN);
     
     //Crate to Humidifier Light
-    move_forward(-FULL_POWER,(transitions_count(15)));
+    move_forward(-FULL_POWER,(transitions_count(14.5)));
     turn_left(TURN_POWER,turn_count_90);
-    move_falling_arm(UP);
+    lever_arm(UP);
     RCS_heading_check(180.0);
     Sleep(3.0);
     move_forward(FULL_POWER,(transitions_count(10)));
     Sleep(5.0); //Check Humidifier Light Position 
     int light_color = check_humidifier();
-    move_forward(FULL_POWER,(transitions_count(3)));
+    move_forward(-FULL_POWER,(transitions_count(1.5)));
     turn_to_humidifier(light_color); //Test Code with Lever Arm
-    move_falling_arm(DOWN);
+    lever_arm(DOWN);
+    //move_falling_arm(DOWN);
 
     // //Humidifier Light to Levers
     // move_forward(-FULL_POWER,(transitions_count(15)));
@@ -324,7 +326,7 @@ void lever_arm_start(){
         LCD.WriteLine("DOWN"); 
         lever_arm_motor.SetPercent(-10);
         lever_arm_motor.SetPercent(-10);
-        Sleep (0.5);
+        Sleep (0.45);
         lever_arm_motor.Stop();
 };
 void flip_correct_lever(){
