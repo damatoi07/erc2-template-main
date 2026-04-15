@@ -357,6 +357,7 @@ void move_falling_arm(int position)
         case (UP):
         LCD.WriteLine("UP"); 
         falling_arm_motor.SetPercent(UP_Percentage);
+        falling_arm_motor.SetPercent(UP_Percentage);
         Sleep (0.3);
         lever_arm_motor.Stop();
         break;
@@ -364,12 +365,14 @@ void move_falling_arm(int position)
         case (DOWN):
         LCD.WriteLine("DOWN"); 
         falling_arm_motor.SetPercent(DOWN_Percentage);
+        falling_arm_motor.SetPercent(DOWN_Percentage);
         Sleep (0.25);
         lever_arm_motor.Stop();
         break;
 
         case (ON):
         LCD.WriteLine("ON & UP"); 
+        lever_arm_motor.SetPercent(UP_Percentage_Lever);
         lever_arm_motor.SetPercent(UP_Percentage_Lever);
         break;
     }
