@@ -86,6 +86,11 @@ void ERCMain()
     // SD.FScanf(fptr, "%f%f", &C_x, &C_y);
     // SD.FScanf(fptr, "%f%f", &D_x, &D_y);
 
+    SD.FPrintf(fptr, "Light: %.2f, %.2f\n", light_x, light_y);
+    SD.FPrintf(fptr, "B: %.2f, %.2f\n", B_x, B_y);
+    SD.FPrintf(fptr, "C: %.2f, %.2f\n", C_x, C_y);
+    SD.FPrintf(fptr, "D: %.2f, %.2f\n", D_x, D_y);
+
     SD.FClose(fptr);
 
     WaitForFinalAction();
