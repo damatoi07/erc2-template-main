@@ -27,7 +27,7 @@
 #define DOWN_Percentage_Lever -30  //Lever arm percentage for going down
 #define UP_Percentage_Lever 45 //Lever arm percentage for going up
 #define RCS_WAIT_TIME_IN_SEC 1.0 //RCS Delay Time
-#define PULSE_TIME 0.17 //Time to pulse towards a direction to make corrections in position
+#define PULSE_TIME 0.15 //Time to pulse towards a direction to make corrections in position
 #define PULSE_POWER 25 //Power to the motors when pulsing towards a direction to make corrections in position
 #define PULSE_COUNT 10 //Turn count for heading check
 #define FORWARDS 0 //Orientation of AruCo Code
@@ -53,7 +53,7 @@ void turn_left(int percent, int counts);
 float transitions_count (float s);
 void compost_bin();
 int check_humidifier();
-void turn_to_humidifier (int light_color);
+void turn_to_humidifier (int light);
 void move_falling_arm (int percent);
 void lever_arm(int position);
 void lever_arm_start();
@@ -70,79 +70,81 @@ void ERCMain()
     //initialize the RCS
     RCS.InitializeTouchMenu("1130D7LFS"); 
 
-    record_positions();
+    //record_positions();
 
     //Store Coordinate values to RCS
-    float light_x, light_y; //Position of CdS cell over humidifier light
-    float levers_x, levers_y; //Position of Robot at center of levers?
-    float C_x, C_y, D_x, D_y;
+    // float light_x, light_y; //Position of CdS cell over humidifier light
+    // float levers_x, levers_y; //Position of Robot at center of levers?
+    // float C_x, C_y, D_x, D_y;
 
-    FEHFile* fptr = SD.FOpen("RCS_POSITIONS.txt", "r");
+    // FEHFile* fptr = SD.FOpen("RCS_POSITIONS.txt", "r");
 
-    SD.FScanf(fptr, "%f%f", &light_x, &light_y);
-    SD.FScanf(fptr, "%f%f", &levers_x, &levers_y);
+    // SD.FScanf(fptr, "%f%f", &light_x, &light_y);
+    // SD.FScanf(fptr, "%f%f", &levers_x, &levers_y);
     // SD.FScanf(fptr, "%f%f", &C_x, &C_y);
     // SD.FScanf(fptr, "%f%f", &D_x, &D_y);
 
-    SD.FClose(fptr);
+    // SD.FClose(fptr);
    
     WaitForFinalAction();
 
-    int initiate=start();
-    if (initiate==1){
+    float CdS = CdS_cell.Value();
+    LCD.WriteLine("CdS Value:");
+    LCD.WriteLine(CdS);
 
-    //Apple Bucket to Top of Ramp
-    move_forward(-FULL_POWER,(transitions_count(4)));
-    move_forward(FULL_POWER,(transitions_count(18)));
-    turn_left(TURN_POWER,turn_count_45);
-    lever_arm_start();
-    RCS_heading_check(180.0);
-    Sleep(3.0);
-    move_forward(FULL_POWER,(transitions_count(9)));
-    lever_arm(UP);
-    move_forward(-FULL_POWER,(transitions_count(9)));
-    turn_right(TURN_POWER,turn_count_45);
-    move_forward(-FULL_POWER,(transitions_count(8)));
-    turn_left(TURN_POWER,turn_count_45);
-    move_forward(-FULL_POWER,(transitions_count(10)));
-    move_forward(FULL_POWER,(transitions_count(2.25)));
-    turn_right(TURN_POWER,turn_count_90);
-    move_falling_arm(ON);
-    move_forward(RAMP_POWER,(transitions_count(45)));
+    // int initiate=start();
+    // if (initiate==1){
 
-    //Wall Alignment
-    move_forward(-FULL_POWER,(transitions_count(8.5)));
-    turn_left(TURN_POWER,(turn_count_45/2));
-    move_forward(FULL_POWER,(transitions_count(8)));
-    turn_left(TURN_POWER,(turn_count_45+(turn_count_45/2)));
-    move_forward(-FULL_POWER,(transitions_count(10)));
+    // //Apple Bucket to Top of Ramp 
+    // //DONE
+    // move_forward(-FULL_POWER,(transitions_count(4)));
+    // move_forward(FULL_POWER,(transitions_count(18)));
+    // turn_left(TURN_POWER,turn_count_45);
+    // lever_arm_start();
+    // RCS_heading_check(180.0);
+    // Sleep(3.0);
+    // move_forward(FULL_POWER,(transitions_count(9)));
+    // lever_arm(UP);
+    // move_forward(-FULL_POWER,(transitions_count(9)));
+    // turn_right(TURN_POWER,turn_count_45);
+    // move_forward(-FULL_POWER,(transitions_count(8)));
+    // turn_left(TURN_POWER,turn_count_45);
+    // move_forward(-FULL_POWER,(transitions_count(10)));
+    // move_forward(FULL_POWER,(transitions_count(2.25)));
+    // turn_right(TURN_POWER,turn_count_90);
+    // move_falling_arm(ON);
+    // move_forward(RAMP_POWER,(transitions_count(45)));
 
-    //Wall to Crate
-    move_forward(FULL_POWER,(transitions_count(6)));
-    turn_right(TURN_POWER,turn_count_90);
-    move_forward(FULL_POWER,(transitions_count(20)));
-    lever_arm(DOWN);
+    // //Wall Alignment
+    // // DONE
+    // move_forward(-FULL_POWER,(transitions_count(8.5)));
+    // turn_left(TURN_POWER,(turn_count_45/2));
+    // move_forward(FULL_POWER,(transitions_count(8)));
+    // turn_left(TURN_POWER,(turn_count_45+(turn_count_45/2)));
+    // move_forward(-FULL_POWER,(transitions_count(10)));
+
+    // //Wall to Crate 
+    // //DONE
+    // move_forward(FULL_POWER,(transitions_count(6)));
+    // turn_right(TURN_POWER,turn_count_90);
+    // move_forward(FULL_POWER,(transitions_count(20)));
+    // lever_arm(DOWN);
     
-    //Crate to Humidifier Light
-    check_x(light_x, BACKWARDS);
+    //Crate to Humidifier Buttons 
+    //WIP
     // move_forward(-FULL_POWER,(transitions_count(15.5)));
-    turn_left(TURN_POWER,turn_count_90);
-    move_falling_arm(DOWN);
-    lever_arm(UP);
-    RCS_heading_check(180.0);
-    // move_forward(FULL_POWER,(transitions_count(10)));
-    check_y(light_y,FORWARDS);
-    Sleep(3.0); //Check Humidifier Light Position 
-    move_forward(FULL_POWER,(transitions_count(12)));
-    Sleep(5.0); //Check Humidifier Light Position 
-    int light_color = check_humidifier();
-    move_forward(FULL_POWER,(transitions_count(1)));
-    move_falling_arm(UP);
-    move_forward(-FULL_POWER,(transitions_count(1.5)));
-    turn_to_humidifier(light_color); //Test Code with Lever Arm
-    // move_falling_arm(DOWN);
+    //check_y(light_y, BACKWARDS);
+    // turn_left(TURN_POWER,turn_count_90);
+    // lever_arm(UP);
+    // RCS_heading_check(180.0);
+    // move_forward((FULL_POWER),(transitions_count(14)));
+    // int light = check_humidifier();
+    // Sleep(3.0); //Check Humidifier Light Position 
+    // move_forward(-FULL_POWER,(transitions_count(3)));
+    // turn_to_humidifier(light);
 
-    // //Humidifier Light to Levers
+    // Humidifier Buttons to Levers 
+    // NEEDS TESTED
     // move_forward(-FULL_POWER,(transitions_count(15)));
     // move_falling_arm(UP);
     // turn_left(TURN_POWER,turn_count_45);
@@ -153,12 +155,31 @@ void ERCMain()
     // move_forward(FULL_POWER,(transitions_count(5))); 
     // lever_arm(UP);
 
-    // //Levers to Top of Ramp
+    // //Levers to Top of Ramp 
+    // //NEEDS TESTED
     // move_forward(-FULL_POWER,(transitions_count(28)));
     // turn_right(TURN_POWER,turn_count_45);
     // move_forward(-FULL_POWER,(transitions_count(45)));
 
-    // //Bottom of Ramp to Compost
+    //Bottom of Ramp to Open Window
+    //NEEDS TESTDED
+    // turn_right(TURN_POWER,turn_count_90);
+    // move_forward(-FULL_POWER, transitions_count(15));
+    // turn_right(TURN_POWER,turn_count_45);
+    // move_forward(-FULL_POWER, transitions_count(10));
+    // turn_right(TURN_POWER,turn_count_45);
+    // move_forward(-FULL_POWER, transitions_count(10));
+    // move_forward(FULL_POWER, transitions_count(20));
+    // move_forward(-FULL_POWER, transitions_count(5));   
+    // turn_right(TURN_POWER,turn_count_45);
+    // move_forward(FULL_POWER, transitions_count(2));
+    // turn_left(TURN_POWER,turn_count_45);
+    // move_falling_arm(DOWN);
+    // move_forward(-FULL_POWER, transitions_count(15)); 
+
+
+    // //Bottom of Ramp to Compost 
+    // //NEEDS REVISED
     // turn_right(TURN_POWER,turn_count_45); 
     // move_forward(-FULL_POWER,(transitions_count(15)));
     // turn_left(TURN_POWER,turn_count_45);
@@ -171,8 +192,8 @@ void ERCMain()
 
     LCD.WriteRC("Requests left: ", 0, 0);
     LCD.WriteRC((int)RCS.RequestsRemaining(), 0, 15);
-    
-    }
+
+    //}
     
    
 };
@@ -275,8 +296,7 @@ void compost_bin(){ //rotate the compost bin from 0 to 300 degrees, wait one sec
     Sleep(0.5);
    
 };
-int check_humidifier(){
-    
+int check_humidifier(){    
     int i=0;
     while (i==0){
     float CdS = CdS_cell.Value();
@@ -285,11 +305,13 @@ int check_humidifier(){
 
     if (CdS <= (red + .82)) {
         LCD.WriteLine("Red Light Detected");
-        return(i=0);
+        i=1;
+        return (1);
         } 
     else if ((CdS > (blue - .82)) && (CdS < 2.5)) {
         LCD.WriteLine("Blue Light Detected");
-        return(i=1);
+        i=1;
+        return (2);
         }
     else {
         LCD.WriteLine("No valid color detected");
@@ -300,29 +322,21 @@ int check_humidifier(){
 void turn_to_humidifier(int light)
 {
     int i=0;
-    while (i==0){
-    float CdS = CdS_cell.Value();
-    move_forward(-FULL_POWER,(transitions_count(3)));
     lever_arm(DOWN);
 
-    if (CdS <= (red + .82)) {
+    if (light ==  1) {
         LCD.WriteLine("Red Light Detected");
+            move_forward(FULL_POWER,(transitions_count(3)));
             turn_right(TURN_POWER, 95);
-            move_forward(FULL_POWER,(transitions_count(2)));
+            move_forward(FULL_POWER,(transitions_count(3)));
             i=1;
-            turn_right(TURN_POWER, 50);
         } 
-    else if ((CdS > (blue - .82)) && (CdS < 2.5)) {
+    else if (light == 2) {
             LCD.WriteLine("Blue Light Detected");
+            move_forward(FULL_POWER,(transitions_count(3)));
             turn_left(TURN_POWER, turn_count_45);
             move_forward(FULL_POWER,(transitions_count(2)));
             i=1;
-            turn_left(-TURN_POWER, 50);
-        }
-    else {
-            LCD.WriteLine("No valid color detected");
-            move_forward(FULL_POWER,(transitions_count(0.5)));
-        }
     };
 };
 void lever_arm(int position){
@@ -440,9 +454,9 @@ void check_x(float x_coordinate, int orientation){
     int i=0;
 
     RCSPose* pose = RCS.RequestPosition();
-
+    while (i !=5){
     // Check if receiving proper RCS coordinates and whether the robot is within an acceptable range
-        if(pose->x != -1 && ((x_coordinate + 1) < pose->x < (x_coordinate - 1)) && i !=5)
+        if(pose->x != -1 && ((x_coordinate + 1) < pose->x < (x_coordinate - 1)))
         {
             if(pose->x > x_coordinate + 1) 
             {
@@ -460,6 +474,7 @@ void check_x(float x_coordinate, int orientation){
 
             i++;
         }
+    }
 };
 void check_y(float y_coordinate, int orientation)
 {
