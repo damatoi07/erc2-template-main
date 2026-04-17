@@ -67,24 +67,25 @@ void record_positions();
 
 void ERCMain()
 {
+    
     //initialize the RCS
     RCS.InitializeTouchMenu("1130D7LFS"); 
 
-    //record_positions();
+    record_positions();
 
     //Store Coordinate values to RCS
-    // float light_x, light_y; //Position of CdS cell over humidifier light
-    // float levers_x, levers_y; //Position of Robot at center of levers?
-    // float C_x, C_y, D_x, D_y;
+    float light_x, light_y; //Position of CdS cell over humidifier light
+    float levers_x, levers_y; //Position of Robot at center of levers?
+    float C_x, C_y, D_x, D_y;
 
-    // FEHFile* fptr = SD.FOpen("RCS_POSITIONS.txt", "r");
+    FEHFile* fptr = SD.FOpen("RCS_POSITIONS.txt", "r");
 
-    // SD.FScanf(fptr, "%f%f", &light_x, &light_y);
-    // SD.FScanf(fptr, "%f%f", &levers_x, &levers_y);
-    // SD.FScanf(fptr, "%f%f", &C_x, &C_y);
-    // SD.FScanf(fptr, "%f%f", &D_x, &D_y);
+    SD.FScanf(fptr, "%f%f", &light_x, &light_y);
+    //SD.FScanf(fptr, "%f%f", &levers_x, &levers_y);
+    //SD.FScanf(fptr, "%f%f", &C_x, &C_y);
+    //SD.FScanf(fptr, "%f%f", &D_x, &D_y);
 
-    // SD.FClose(fptr);
+    SD.FClose(fptr);
    
     WaitForFinalAction();
 
@@ -92,108 +93,118 @@ void ERCMain()
     LCD.WriteLine("CdS Value:");
     LCD.WriteLine(CdS);
 
-    // int initiate=start();
-    // if (initiate==1){
+    int initiate=start();
+    if (initiate==1){
 
     // //Apple Bucket to Top of Ramp 
     // //DONE
-    // move_forward(-FULL_POWER,(transitions_count(4)));
-    // move_forward(FULL_POWER,(transitions_count(18)));
-    // turn_left(TURN_POWER,turn_count_45);
-    // lever_arm_start();
-    // RCS_heading_check(180.0);
-    // Sleep(3.0);
-    // move_forward(FULL_POWER,(transitions_count(9)));
-    // lever_arm(UP);
-    // move_forward(-FULL_POWER,(transitions_count(9)));
-    // turn_right(TURN_POWER,turn_count_45);
-    // move_forward(-FULL_POWER,(transitions_count(8)));
-    // turn_left(TURN_POWER,turn_count_45);
-    // move_forward(-FULL_POWER,(transitions_count(10)));
-    // move_forward(FULL_POWER,(transitions_count(2.25)));
-    // turn_right(TURN_POWER,turn_count_90);
-    // move_falling_arm(ON);
-    // move_forward(RAMP_POWER,(transitions_count(45)));
+    move_forward(-FULL_POWER,(transitions_count(4)));
+    move_forward(FULL_POWER,(transitions_count(18)));
+    turn_left(TURN_POWER,turn_count_45);
+    lever_arm_start();
+    RCS_heading_check(180.0);
+    Sleep(3.0);
+    move_forward(FULL_POWER,(transitions_count(9)));
+    lever_arm(UP);
+    move_forward(-FULL_POWER,(transitions_count(9)));
+    turn_right(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER,(transitions_count(8)));
+    turn_left(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER,(transitions_count(10)));
+    move_forward(FULL_POWER,(transitions_count(2.25)));
+    turn_right(TURN_POWER,turn_count_90);
+    move_falling_arm(ON);
+    move_forward(RAMP_POWER,(transitions_count(45)));
 
     // //Wall Alignment
     // // DONE
-    // move_forward(-FULL_POWER,(transitions_count(8.5)));
-    // turn_left(TURN_POWER,(turn_count_45/2));
-    // move_forward(FULL_POWER,(transitions_count(8)));
-    // turn_left(TURN_POWER,(turn_count_45+(turn_count_45/2)));
-    // move_forward(-FULL_POWER,(transitions_count(10)));
+    move_forward(-FULL_POWER,(transitions_count(8.5)));
+    turn_left(TURN_POWER,(turn_count_45/2));
+    move_forward(FULL_POWER,(transitions_count(8)));
+    turn_left(TURN_POWER,(turn_count_45+(turn_count_45/2)));
+    move_forward(-FULL_POWER,(transitions_count(10)));
 
     // //Wall to Crate 
     // //DONE
-    // move_forward(FULL_POWER,(transitions_count(6)));
-    // turn_right(TURN_POWER,turn_count_90);
-    // move_forward(FULL_POWER,(transitions_count(20)));
-    // lever_arm(DOWN);
+    move_forward(FULL_POWER,(transitions_count(6)));
+    turn_right(TURN_POWER,turn_count_90);
+    move_forward(FULL_POWER,(transitions_count(20)));
+    lever_arm(DOWN);
     
     //Crate to Humidifier Buttons 
     //WIP
-    // move_forward(-FULL_POWER,(transitions_count(15.5)));
-    //check_y(light_y, BACKWARDS);
-    // turn_left(TURN_POWER,turn_count_90);
-    // lever_arm(UP);
-    // RCS_heading_check(180.0);
-    // move_forward((FULL_POWER),(transitions_count(14)));
-    // int light = check_humidifier();
-    // Sleep(3.0); //Check Humidifier Light Position 
-    // move_forward(-FULL_POWER,(transitions_count(3)));
-    // turn_to_humidifier(light);
+    move_forward(-FULL_POWER,(transitions_count(15.5)));
+    check_y(light_y, BACKWARDS);
+    turn_left(TURN_POWER,turn_count_90);
+    lever_arm(UP);
+    RCS_heading_check(180.0);
+    move_forward((FULL_POWER),(transitions_count(12)));
+    int light = check_humidifier();
+    Sleep(3.0); //Check Humidifier Light Position 
+    move_forward(-FULL_POWER,(transitions_count(3)));
+    turn_to_humidifier(light);
 
     // Humidifier Buttons to Levers 
     // NEEDS TESTED
-    // move_forward(-FULL_POWER,(transitions_count(15)));
-    // move_falling_arm(UP);
-    // turn_left(TURN_POWER,turn_count_45);
-    // move_forward(FULL_POWER,(transitions_count(17)));
-    // Sleep(3.0); //Check position for levers
-    // lever_arm(DOWN);
-    // move_forward(-FULL_POWER,(transitions_count(5))); 
-    // move_forward(FULL_POWER,(transitions_count(5))); 
-    // lever_arm(UP);
+    move_forward(-FULL_POWER,(transitions_count(15)));
+    move_falling_arm(UP);
+    turn_left(TURN_POWER,turn_count_45);
+    move_forward(FULL_POWER,(transitions_count(17)));
+    Sleep(3.0); //Check position for levers
+    lever_arm(DOWN);
+    move_forward(-FULL_POWER,(transitions_count(5))); 
+    move_forward(FULL_POWER,(transitions_count(5))); 
+    lever_arm(UP);
 
     // //Levers to Top of Ramp 
     // //NEEDS TESTED
-    // move_forward(-FULL_POWER,(transitions_count(28)));
-    // turn_right(TURN_POWER,turn_count_45);
-    // move_forward(-FULL_POWER,(transitions_count(45)));
+    move_forward(-FULL_POWER,(transitions_count(28)));
+    turn_right(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER,(transitions_count(45)));
 
+    
     //Bottom of Ramp to Open Window
     //NEEDS TESTDED
-    // turn_right(TURN_POWER,turn_count_90);
-    // move_forward(-FULL_POWER, transitions_count(15));
-    // turn_right(TURN_POWER,turn_count_45);
-    // move_forward(-FULL_POWER, transitions_count(10));
-    // turn_right(TURN_POWER,turn_count_45);
-    // move_forward(-FULL_POWER, transitions_count(10));
-    // move_forward(FULL_POWER, transitions_count(20));
-    // move_forward(-FULL_POWER, transitions_count(5));   
-    // turn_right(TURN_POWER,turn_count_45);
-    // move_forward(FULL_POWER, transitions_count(2));
-    // turn_left(TURN_POWER,turn_count_45);
-    // move_falling_arm(DOWN);
-    // move_forward(-FULL_POWER, transitions_count(15)); 
+    turn_left(TURN_POWER,turn_count_90);
+    move_forward(-FULL_POWER, transitions_count(15));
+    turn_right(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER, transitions_count(10));
+    turn_left(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER, transitions_count(10));
+    move_forward(FULL_POWER, transitions_count(20));
+    move_forward(-FULL_POWER, transitions_count(5));   
+    turn_right(TURN_POWER,turn_count_45);
+    move_forward(FULL_POWER, transitions_count(2));
+    turn_left(TURN_POWER,turn_count_45);
+    move_falling_arm(UP);
+    Sleep(0.1);
+    move_falling_arm(DOWN);
+    move_forward(-FULL_POWER, transitions_count(15)); 
 
 
     // //Bottom of Ramp to Compost 
     // //NEEDS REVISED
-    // turn_right(TURN_POWER,turn_count_45); 
-    // move_forward(-FULL_POWER,(transitions_count(15)));
-    // turn_left(TURN_POWER,turn_count_45);
-    // move_forward(-FULL_POWER,(transitions_count(5)));
-    // move_forward(FULL_POWER,(transitions_count(5)));
-    // turn_right(TURN_POWER,turn_count_90); 
-    // move_forward(-FULL_POWER,(transitions_count(5)));
-    // Sleep(3.0); //Check compost position
-    // compost_bin();
+    turn_right(TURN_POWER,turn_count_45); 
+    move_forward(-FULL_POWER,(transitions_count(15)));
+    turn_left(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER,(transitions_count(5)));
+    move_forward(FULL_POWER,(transitions_count(5)));
+    turn_right(TURN_POWER,turn_count_90); 
+    move_forward(-FULL_POWER,(transitions_count(5)));
+    Sleep(3.0); //Check compost position
+    compost_bin();
 
-    LCD.WriteRC("Requests left: ", 0, 0);
-    LCD.WriteRC((int)RCS.RequestsRemaining(), 0, 15);
+    move_forward(FULL_POWER, (transitions_count(11)));
+    turn_left(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER, (transitions_count(12)));
 
-    //}
+    // LCD.WriteRC("Requests left: ", 0, 0);
+    // LCD.WriteRC((int)RCS.RequestsRemaining(), 0, 15);
+
+    }
+
+
+
     
    
 };
@@ -208,7 +219,7 @@ int start ()//Go after start light is detected to be ON or after 30 seconds
         float CdS = CdS_cell.Value();
         LCD.WriteLine(CdS);
         LCD.Clear();
-        if (((CdS <= (red+1)))||((TimeNow()-start_time)>=5))
+        if (((CdS <= (red+1)))||((TimeNow()-start_time)>=30))
         {
             i=1;
             return(1);
@@ -315,7 +326,7 @@ int check_humidifier(){
         }
     else {
         LCD.WriteLine("No valid color detected");
-        move_forward(HALF_POWER,(transitions_count(0.5)));
+        move_forward(HALF_POWER,(transitions_count(0.25)));
         }
     }
 }
@@ -408,6 +419,12 @@ void move_falling_arm(int position)
         falling_arm_motor.SetPercent(UP_Percentage);
         falling_arm_motor.SetPercent(UP_Percentage);
         break;
+
+        default:
+        falling_arm_motor.SetPercent(10);
+        Sleep(0.35);
+        falling_arm_motor.Stop();
+        
     }
 };
 void RCS_heading_check (float heading_angle){
