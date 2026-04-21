@@ -90,43 +90,43 @@ void ERCMain()
 
     WaitForFinalAction();
 
-    // int initiate=start();
-    // if (initiate==1){
+    int initiate=start();
+    if (initiate==1){
 
-    // //Apple Bucket to Top of Ramp 
-    // //DONE
-    // move_forward(-FULL_POWER,(transitions_count(4)));
-    // move_forward(FULL_POWER,(transitions_count(18)));
-    // turn_left(TURN_POWER,turn_count_45);
-    // lever_arm_start();
-    // RCS_heading_check(180.0);
-    // Sleep(3.0);
-    // move_forward(FULL_POWER,(transitions_count(9)));
-    // lever_arm(UP);
-    // move_forward(-FULL_POWER,(transitions_count(9)));
-    // turn_right(TURN_POWER,turn_count_45);
-    // move_forward(-FULL_POWER,(transitions_count(8)));
-    // turn_left(TURN_POWER,turn_count_45);
-    // move_forward(-FULL_POWER,(transitions_count(10)));
-    // move_forward(FULL_POWER,(transitions_count(2.25)));
-    // turn_right(TURN_POWER,turn_count_90);
-    // move_falling_arm(ON);
-    // move_forward(RAMP_POWER,(transitions_count(45)));
+    //Apple Bucket to Top of Ramp 
+    //DONE
+    move_forward(-FULL_POWER,(transitions_count(4)));
+    move_forward(FULL_POWER,(transitions_count(18)));
+    turn_left(TURN_POWER,turn_count_45);
+    lever_arm_start();
+    RCS_heading_check(180.0);
+    Sleep(2.0);
+    move_forward(FULL_POWER,(transitions_count(9)));
+    lever_arm(UP);
+    move_forward(-FULL_POWER,(transitions_count(9)));
+    turn_right(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER,(transitions_count(8)));
+    turn_left(TURN_POWER,turn_count_45);
+    move_forward(-FULL_POWER,(transitions_count(10)));
+    move_forward(FULL_POWER,(transitions_count(2.25)));
+    turn_right(TURN_POWER,turn_count_90);
+    move_falling_arm(ON);
+    move_forward(RAMP_POWER,(transitions_count(45)));
 
-    // // //Wall Alignment
-    // // // DONE
-    // move_forward(-FULL_POWER,(transitions_count(8.5)));
-    // turn_left(TURN_POWER,(turn_count_45/2));
-    // move_forward(FULL_POWER,(transitions_count(8)));
-    // turn_left(TURN_POWER,(turn_count_45+(turn_count_45/2)));
-    // move_forward(-FULL_POWER,(transitions_count(10)));
+    //Wall Alignment
+    // DONE
+    move_forward(-FULL_POWER,(transitions_count(8.5)));
+    turn_left(TURN_POWER,(turn_count_45/2));
+    move_forward(FULL_POWER,(transitions_count(8)));
+    turn_left(TURN_POWER,(turn_count_45+(turn_count_45/2)));
+    move_forward(-FULL_POWER,(transitions_count(10)));
 
-    // // //Wall to Crate 
-    // // //DONE
-    // move_forward(FULL_POWER,(transitions_count(6)));
-    // turn_right(TURN_POWER,turn_count_90);
-    // move_forward(FULL_POWER,(transitions_count(20)));
-    // lever_arm(DOWN);
+    //Wall to Crate 
+    //DONE
+    move_forward(FULL_POWER,(transitions_count(6)));
+    turn_right(TURN_POWER,turn_count_90);
+    move_forward(FULL_POWER,(transitions_count(20)));
+    lever_arm(DOWN);
     
     //Crate to Humidifier Buttons 
     //WIP
@@ -190,7 +190,7 @@ void ERCMain()
 
     // LCD.WriteRC("Requests left: ", 0, 0);
     // LCD.WriteRC((int)RCS.RequestsRemaining(), 0, 15);
-    // } 
+    } 
 };
 
 int start ()//Go after start light is detected to be ON or after 30 seconds
