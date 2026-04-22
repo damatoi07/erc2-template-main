@@ -51,8 +51,8 @@ void turn_left (int percent, int counts);
 float transitions_count (float s);
 void compost_bin();
 int check_humidifier();
-int move_to_light (int percent);
-void turn_to_humidifier (int light);
+// int move_to_light (int percent);
+void turn_to_humidifier ();
 void move_falling_arm (int percent);
 void lever_arm(int position);
 void lever_arm_start();
@@ -69,7 +69,6 @@ void record_positions();
 
 void ERCMain()
 {
-
     //initialize the RCS
     RCS.InitializeTouchMenu("1130D7LFS"); 
 
@@ -109,7 +108,7 @@ void ERCMain()
     move_forward(-FULL_POWER,(transitions_count(8)));
     turn_left(TURN_POWER,turn_count_45);
     move_forward(-FULL_POWER,(transitions_count(10)));
-    move_forward(FULL_POWER,(transitions_count(2.25)));
+    move_forward(FULL_POWER,(transitions_count(2.1)));
     turn_right(TURN_POWER,turn_count_90);
     move_falling_arm(ON);
     move_forward(RAMP_POWER,(transitions_count(45)));
@@ -131,12 +130,18 @@ void ERCMain()
     
     //Crate to Humidifier Buttons 
     //WIP
-    move_forward(-FULL_POWER,(transitions_count(16.5)));
+    move_forward(-FULL_POWER,(transitions_count(15)));
     check_y(light_y, BACKWARDS);
     turn_left(TURN_POWER,turn_count_90);
+    RCS_heading_check(180);
     lever_arm(UP); 
-    int light = move_to_light(HALF_POWER);
-    turn_to_humidifier(light);
+    move_forward(FULL_POWER,(transitions_count(15.5)));
+    Sleep(1.0);
+    check_x(light_x, FORWARDS);
+    Sleep(1.0);
+    // int light = move_to_light(10);
+    // Sleep(2.0);
+    turn_to_humidifier();
 
 
     // Humidifier Buttons to Levers 
@@ -145,9 +150,10 @@ void ERCMain()
     Sleep(2.0);
     move_falling_arm(UP);
     lever_arm(UP);
+    Sleep(1.0);
     turn_right(TURN_POWER,turn_count_45);
     RCS_heading_check(135);
-    move_forward(FULL_POWER,(transitions_count(16.5)));
+    move_forward(FULL_POWER,(transitions_count(17.8)));
     Sleep(2.0); //Check position for levers
     flip_fertilizer();
 
@@ -155,12 +161,12 @@ void ERCMain()
     // WORKS
     move_forward(-FULL_POWER,(transitions_count(16)));
     turn_left(TURN_POWER,turn_count_45);
-    move_forward(-FULL_POWER,(transitions_count(20)));
+    move_forward(-FULL_POWER,(transitions_count(18)));
     move_forward(FULL_POWER,(transitions_count(1.25)));
     turn_right(TURN_POWER,turn_count_90);
     RCS_heading_check(90);
 
-    //Top of Ramp to Open Window
+    //Top of Ramp to Window
     //NEEDS TESTED
     move_forward(-FULL_POWER, transitions_count(25));
     turn_right(TURN_POWER,turn_count_90);
@@ -168,24 +174,35 @@ void ERCMain()
     move_forward(-FULL_POWER, transitions_count(18));
     turn_right(TURN_POWER,turn_count_90);
     RCS_heading_check(270);
-    move_forward(-FULL_POWER, transitions_count(8));
+    move_forward(-FULL_POWER, transitions_count(8.5));
     turn_left(TURN_POWER,turn_count_90);
     move_falling_arm(ON);
+
+    //Opening Window
+    Sleep(1.0);
     move_falling_arm(DOWN);
-    turn_right(HALF_POWER,(170));
+    turn_right(HALF_POWER,200);
     move_falling_arm(ON);
     move_forward(HALF_POWER, transitions_count(3));
+    Sleep(1.0);
     move_falling_arm(DOWN);
     move_forward(-HALF_POWER, transitions_count(1.5));
-    turn_left(HALF_POWER,170);
+    turn_left(HALF_POWER, 200);
+    Sleep(1.0);
     move_falling_arm(ON);
+    turn_right(HALF_POWER, turn_count_45);
+    move_forward(-HALF_POWER, transitions_count(1.5));
+    turn_left(HALF_POWER, 150);
     RCS_heading_check(180);
 
     //Window to Compost 
     //NEEDS TESTED
-    turn_left(TURN_POWER,turn_count_90); 
-    move_forward(-FULL_POWER,(transitions_count(15)));
+    move_falling_arm(ON);
+    turn_right(HALF_POWER, turn_count_45);
+    move_forward(HALF_POWER, transitions_count(2));
+    turn_left(HALF_POWER, 150);
     RCS_heading_check(90);
+    move_forward(-FULL_POWER,(transitions_count(15)));
     Sleep(0.5);
     compost_bin();
 
@@ -225,15 +242,11 @@ void lever_arm_start(){ //Initiates the starting postion of the lever arm
             lever_arm_motor.Stop();
             i = 1; // Exit loop when switch is pressed
         }
-        else if ((TimeNow() - start_time) >= 5){
-            lever_arm_motor.Stop();
-            i = 1; // Exit loop on timeout
-        }
-        else {
+        else if ((TimeNow() - start_time) >= 4.0){
             lever_arm_motor.SetPercent(-10);
+            start_time=TimeNow();
         }
     }
-    LCD.WriteLine("Test");
 };
 void move_forward(int percent, float counts) //Drive Forward for a specified distance at a specified speed using encoders
 {
@@ -299,45 +312,74 @@ float transitions_count (float s)//Calculate the number of transitions the encod
 {
     return ((s*N)/(2*PI*r));
 };
-int move_to_light(int percent) //Move forwards towards the humidifier light until a valid color is detected
-{
-    //Reset encoder counts
-    right_encoder.ResetCounts();
-    left_encoder.ResetCounts();
+// int move_to_light(int percent) //Move forwards towards the humidifier light until a valid color is detected
+// {
+//     //Reset encoder counts
+//     right_encoder.ResetCounts();
+//     left_encoder.ResetCounts();
 
-    //Set both motors to desired percent
-    right_motor.SetPercent(percent);
-    left_motor.SetPercent(percent);
+//     //Set both motors to desired percent
+//     right_motor.SetPercent(percent);
+//     left_motor.SetPercent(percent);
+//     int i=0;
+//     while (i==0){
+//     float CdS = CdS_cell.Value();
+//     LCD.WriteLine("CdS Value:");
+//     LCD.WriteLine(CdS);
+    
+//     //Red: 0.96
+//     //Blue 1.79
+//     //Edge: 1.24
+
+//     if (CdS <= (red + .82)) {
+//         LCD.WriteLine("Red Light Detected");
+//         //Turn off motors
+//         right_motor.Stop();
+//         left_motor.Stop();
+//         LCD.Clear();
+//         LCD.WriteLine(CdS);
+//         return(1);
+//         } 
+//     else if ((CdS > (blue - .2)) && (CdS < 1.84)) {
+//         LCD.WriteLine("Blue Light Detected");
+//         //Turn off motors
+//         right_motor.Stop();
+//         left_motor.Stop();
+//         LCD.Clear();
+//         LCD.WriteLine(CdS);
+//         return(2);
+//         }
+//     else {
+//         LCD.WriteLine("No valid color detected");
+//         }
+//     }
+// };
+void turn_to_humidifier()
+{
     int i=0;
     while (i==0){
     float CdS = CdS_cell.Value();
     LCD.WriteLine("CdS Value:");
     LCD.WriteLine(CdS);
-    
+
     if (CdS <= (red + .82)) {
         LCD.WriteLine("Red Light Detected");
-        //Turn off motors
-        right_motor.Stop();
-        left_motor.Stop();
-        LCD.Clear();
-        LCD.WriteLine(CdS);
-        return(1);
-        i=1;
+            turn_right(TURN_POWER, 50);
+            move_forward(FULL_POWER,(transitions_count(2)));
+            i=1;
+            turn_right(TURN_POWER, 50);
         } 
-    else if ((CdS > (blue - .82))) {
-        LCD.WriteLine("Blue Light Detected");
-        //Turn off motors
-        right_motor.Stop();
-        left_motor.Stop();
-        LCD.Clear();
-        LCD.WriteLine(CdS);
-        return(2);
-        i=1;
+    else if ((CdS > (blue - .82)) && (CdS < 1.85)) {
+            turn_left(TURN_POWER, 50);
+            move_forward(FULL_POWER,(transitions_count(2)));
+            i=1;
+            turn_left(-TURN_POWER, 50);
         }
     else {
-        LCD.WriteLine("No valid color detected");
+            LCD.WriteLine("No valid color detected");
+            move_forward(FULL_POWER,(transitions_count(0.5)));
         }
-    }
+    };
 };
 void turn_to_humidifier (int light){ //Press the appropriate button after the light color is read
     int i=0;
@@ -346,10 +388,11 @@ void turn_to_humidifier (int light){ //Press the appropriate button after the li
     LCD.WriteLine("CdS Value:");
     LCD.WriteLine(CdS);
 
+
  if (light==1) {
         LCD.WriteLine("Red Light Detected");
             move_forward(-FULL_POWER,(transitions_count(2)));
-            turn_right(TURN_POWER, 50);
+            turn_right(TURN_POWER, 40);
             lever_arm(DOWN);
             move_forward(FULL_POWER,(transitions_count(2)));
             i=1;
@@ -375,14 +418,15 @@ void flip_fertilizer(){ //Recieve the flip the appropriate fertilizer lever
     switch(lever){
         case(0):
         turn_left(TURN_POWER, 100);
-        move_forward(FULL_POWER,(transitions_count(2)));
+        move_forward(FULL_POWER,(transitions_count(4)));
         lever_arm(DOWN);
         move_forward(-FULL_POWER,(transitions_count(7))); 
         lever_arm(DOWN);
+        Sleep(5.0);
         move_forward(FULL_POWER,(transitions_count(7))); 
         lever_arm(UP);
         turn_right(TURN_POWER, 100);
-        move_forward(-FULL_POWER,(transitions_count(2)));
+        move_forward(-FULL_POWER,(transitions_count(4)));
         RCS_heading_check(135);
         break;
 
@@ -391,6 +435,7 @@ void flip_fertilizer(){ //Recieve the flip the appropriate fertilizer lever
         lever_arm(DOWN);
         move_forward(-FULL_POWER,(transitions_count(7))); 
         lever_arm(DOWN);
+        Sleep(5.0);
         move_forward(FULL_POWER,(transitions_count(7))); 
         lever_arm(UP);
         move_forward(-FULL_POWER,(transitions_count(2)));
@@ -403,6 +448,7 @@ void flip_fertilizer(){ //Recieve the flip the appropriate fertilizer lever
         lever_arm(DOWN);
         move_forward(-FULL_POWER,(transitions_count(7))); 
         lever_arm(DOWN);
+        Sleep(5.0);
         move_forward(FULL_POWER,(transitions_count(7))); 
         lever_arm(UP);
         move_forward(-FULL_POWER,(transitions_count(2)));
@@ -486,7 +532,7 @@ void RCS_heading_check (float heading_angle){ //Check the heading using RCS
     LCD.Clear();
     LCD.WriteLine(pose->heading);
 
-        while(pose->heading != heading_angle && ((heading_angle - 1) < pose->heading < (heading_angle + 1)) && i !=5)
+        while(pose->heading != heading_angle && ((heading_angle - 1) < pose->heading < (heading_angle + 1)) && i !=5) // was told to add an additional && statement for functionality
         {
             if(pose->heading > heading_angle + 1)
             {
@@ -521,7 +567,7 @@ void check_x(float x_coordinate, int orientation){ //Check the robot's x-positio
     RCSPose* pose = RCS.RequestPosition();
     while (i !=5){
     // Check if receiving proper RCS coordinates and whether the robot is within an acceptable range
-        if(pose->x != -1 && ((x_coordinate + 1) < pose->x < (x_coordinate - 1)))
+        if(((pose->x != -1 && ((x_coordinate + 1)) < pose->x) && (pose->x < (x_coordinate - 1)))) // Added an additional && to fix functionality
         {
             if(pose->x > x_coordinate + 1) 
             {
@@ -539,6 +585,7 @@ void check_x(float x_coordinate, int orientation){ //Check the robot's x-positio
 
             i++;
         }
+        i=5;
     }
 };
 void check_y(float y_coordinate, int orientation) //Check the robot's y-position using RCS
@@ -551,11 +598,11 @@ void check_y(float y_coordinate, int orientation) //Check the robot's y-position
 
     int i=0;
 
-
     RCSPose* pose = RCS.RequestPosition();
 
+    while(i !=5){
     // Check if receiving proper RCS coordinates and whether the robot is within an acceptable range
-        while(pose->y != -1 && ((y_coordinate + 1) < pose->y < (y_coordinate - 1)) && i !=5)
+        while((pose->y != -1 && ((y_coordinate + 1) < pose->y) && (pose->y < (y_coordinate - 1)))) // Added an additional check to correct functionality
         {
             if(pose->y > (y_coordinate + 1))
             {
@@ -572,7 +619,9 @@ void check_y(float y_coordinate, int orientation) //Check the robot's y-position
             pose = RCS.RequestPosition();
 
             i++;
-    }   
+        } 
+        i=5;  
+    };
 };
 void pulse_forward(int percent, float seconds) //Pulse towards to correct x or y-position
 {
