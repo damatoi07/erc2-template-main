@@ -69,6 +69,7 @@ void record_positions();
 
 void ERCMain()
 {
+
     //initialize the RCS
     RCS.InitializeTouchMenu("1130D7LFS"); 
 
@@ -100,7 +101,7 @@ void ERCMain()
     turn_left(TURN_POWER,turn_count_45);
     lever_arm_start();
     RCS_heading_check(180.0);
-    Sleep(2.0);
+    Sleep(3.0);
     move_forward(FULL_POWER,(transitions_count(9)));
     lever_arm(UP);
     move_forward(-FULL_POWER,(transitions_count(9)));
@@ -130,7 +131,7 @@ void ERCMain()
     
     //Crate to Humidifier Buttons 
     //WIP
-    move_forward(-FULL_POWER,(transitions_count(15.5)));
+    move_forward(-FULL_POWER,(transitions_count(16.5)));
     check_y(light_y, BACKWARDS);
     turn_left(TURN_POWER,turn_count_90);
     lever_arm(UP); 
@@ -190,7 +191,8 @@ void ERCMain()
 
     // LCD.WriteRC("Requests left: ", 0, 0);
     // LCD.WriteRC((int)RCS.RequestsRemaining(), 0, 15);
-    } 
+    }
+     
 };
 
 int start ()//Go after start light is detected to be ON or after 30 seconds
@@ -219,14 +221,19 @@ void lever_arm_start(){ //Initiates the starting postion of the lever arm
     while (i == 0){
         //read the value of the digital input into x
         bool x = bump_switch.Value();
-        if (x == 1){
+        if (x == 0){
             lever_arm_motor.Stop();
-            }
-        else if (x == 0 || ((TimeNow()-start_time)>=5)){ //Sets the motor percent every 5 seconds that the switch is not presssed
+            i = 1; // Exit loop when switch is pressed
+        }
+        else if ((TimeNow() - start_time) >= 5){
+            lever_arm_motor.Stop();
+            i = 1; // Exit loop on timeout
+        }
+        else {
             lever_arm_motor.SetPercent(-10);
-            float start_time = TimeNow();
-        };
-    };
+        }
+    }
+    LCD.WriteLine("Test");
 };
 void move_forward(int percent, float counts) //Drive Forward for a specified distance at a specified speed using encoders
 {
@@ -317,7 +324,7 @@ int move_to_light(int percent) //Move forwards towards the humidifier light unti
         return(1);
         i=1;
         } 
-    else if ((CdS > (blue - .82)) && (CdS < 1.4)) {
+    else if ((CdS > (blue - .82))) {
         LCD.WriteLine("Blue Light Detected");
         //Turn off motors
         right_motor.Stop();
