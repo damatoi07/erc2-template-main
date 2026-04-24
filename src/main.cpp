@@ -38,8 +38,8 @@ DigitalEncoder right_encoder(FEHIO::Pin8);
 DigitalEncoder left_encoder(FEHIO::Pin9); 
 AnalogInputPin CdS_cell(FEHIO::Pin14);
 FEHServo compost_rotator (FEHServo::Servo7);
-FEHMotor falling_arm_motor(FEHMotor::Motor1, 9.0); //TT Motor
-FEHMotor lever_arm_motor (FEHMotor::Motor2, 9.0); //TT Motor
+FEHMotor falling_arm_motor(FEHMotor::Motor1, 5.0); //TT Motor
+FEHMotor lever_arm_motor (FEHMotor::Motor2, 5.0); //TT Motor
 DigitalInputPin bump_switch (FEHIO::Pin0); //Bump Swtich
 
 
@@ -69,10 +69,11 @@ void record_positions();
 
 void ERCMain()
 {
+
     //initialize the RCS
     RCS.InitializeTouchMenu("1130D7LFS"); 
 
-    record_positions();
+    //record_positions();
 
     // //Store Coordinate values to RCS
     float light_x, light_y; //Position of CdS cell over humidifier light
@@ -100,10 +101,25 @@ void ERCMain()
     turn_left(TURN_POWER,turn_count_45);
     lever_arm_start();
     RCS_heading_check(180.0);
-    Sleep(3.0);
+    Sleep(1.0);
     move_forward(FULL_POWER,(transitions_count(9)));
+    Sleep(1.0);
     lever_arm(UP);
-    move_forward(-FULL_POWER,(transitions_count(9)));
+    Sleep(1.0);
+
+    /*Apple to Composter
+
+    move_forward(-FULL_POWER,(transitions_count(4)));
+    turn_right(TURN_POWER,turn_count_90);
+    move_forward(-FULL_POWER,(transitions_count(15)));
+    move_forward(FULL_POWER,(transitions_count(1)));
+    Sleep(2.0);
+    compost_bin();
+    move_forward(FULL_POWER,(transitions_count(15)));
+    turn_left(TURN_POWER,turn_count_90);
+     */
+    
+    move_forward(-FULL_POWER,(transitions_count(9))); //change the count parameter if using apple to composter
     turn_right(TURN_POWER,turn_count_45);
     move_forward(-FULL_POWER,(transitions_count(8)));
     turn_left(TURN_POWER,turn_count_45);
@@ -136,17 +152,16 @@ void ERCMain()
     RCS_heading_check(180);
     lever_arm(UP); 
     move_forward(FULL_POWER,(transitions_count(15.5)));
-    Sleep(1.0);
     check_x(light_x, FORWARDS);
-    Sleep(1.0);
     // int light = move_to_light(10);
     // Sleep(2.0);
-    turn_to_humidifier();
+    //turn_to_humidifier();
+    move_forward(FULL_POWER,(transitions_count(5)));
 
 
     // Humidifier Buttons to Levers 
     // NEEDS TESTED WITH THE NEW ARM ATTATCHMENT
-    move_forward(-FULL_POWER,(transitions_count(16)));
+    move_forward(-FULL_POWER,(transitions_count(18)));
     Sleep(2.0);
     move_falling_arm(UP);
     lever_arm(UP);
@@ -206,9 +221,24 @@ void ERCMain()
     Sleep(0.5);
     compost_bin();
 
+    move_forward(FULL_POWER,(transitions_count(12)));
+    turn_left(FULL_POWER, turn_count_45);
+    move_forward(-FULL_POWER,(transitions_count(20)));
+
     // LCD.WriteRC("Requests left: ", 0, 0);
     // LCD.WriteRC((int)RCS.RequestsRemaining(), 0, 15);
+
     }
+
+    
+
+    
+
+    /*lever arm test
+        Sleep(1.0);
+        lever_arm_start();
+    */
+    
      
 };
 
@@ -230,20 +260,25 @@ int start ()//Go after start light is detected to be ON or after 30 seconds
     };
 };
 void lever_arm_start(){ //Initiates the starting postion of the lever arm
-    Sleep(0.5); 
-    lever_arm_motor.SetPercent(-10);
-    lever_arm_motor.SetPercent(-10);
+    
+    lever_arm_motor.Stop();
+    Sleep(0.5);
+    lever_arm_motor.SetPercent(-20);
+    lever_arm_motor.SetPercent(-20);
     int i = 0;
     float start_time = TimeNow();
     while (i == 0){
         //read the value of the digital input into x
+        //lever_arm_motor.SetPercent(-50);
+        //lever_arm_motor.SetPercent(-50);
         bool x = bump_switch.Value();
         if (x == 0){
             lever_arm_motor.Stop();
             i = 1; // Exit loop when switch is pressed
         }
         else if ((TimeNow() - start_time) >= 4.0){
-            lever_arm_motor.SetPercent(-10);
+            lever_arm_motor.SetPercent(-20);
+            lever_arm_motor.SetPercent(-20);
             start_time=TimeNow();
         }
     }
@@ -420,37 +455,42 @@ void flip_fertilizer(){ //Recieve the flip the appropriate fertilizer lever
         turn_left(TURN_POWER, 100);
         move_forward(FULL_POWER,(transitions_count(4)));
         lever_arm(DOWN);
-        move_forward(-FULL_POWER,(transitions_count(7))); 
-        lever_arm(DOWN);
+        move_forward(-FULL_POWER,(transitions_count(5))); 
+        lever_arm(DOWN+10);
         Sleep(5.0);
         move_forward(FULL_POWER,(transitions_count(7))); 
         lever_arm(UP);
+        Sleep(1.0);
         turn_right(TURN_POWER, 100);
-        move_forward(-FULL_POWER,(transitions_count(4)));
+        move_forward(-FULL_POWER,(transitions_count(6)));
         RCS_heading_check(135);
         break;
 
         case(1):
-        move_forward(FULL_POWER,(transitions_count(5)));
+
+        move_forward(FULL_POWER,(transitions_count(3)));
         lever_arm(DOWN);
         move_forward(-FULL_POWER,(transitions_count(7))); 
-        lever_arm(DOWN);
+        lever_arm(DOWN+10);
         Sleep(5.0);
         move_forward(FULL_POWER,(transitions_count(7))); 
         lever_arm(UP);
+        Sleep(1.0);
         move_forward(-FULL_POWER,(transitions_count(2)));
         RCS_heading_check(135);
+        
         break;
 
         case(2):
         turn_right(TURN_POWER, 100);
-        move_forward(FULL_POWER,(transitions_count(2)));
+        move_forward(FULL_POWER,(transitions_count(4)));
         lever_arm(DOWN);
         move_forward(-FULL_POWER,(transitions_count(7))); 
-        lever_arm(DOWN);
+        lever_arm(DOWN+10);
         Sleep(5.0);
         move_forward(FULL_POWER,(transitions_count(7))); 
         lever_arm(UP);
+        Sleep(1.0);
         move_forward(-FULL_POWER,(transitions_count(2)));
         turn_left(TURN_POWER, 100);
         RCS_heading_check(135);
@@ -461,7 +501,7 @@ void lever_arm(int position){ //Control the position of the lever arm
     switch (position){
         case (UP):
         LCD.WriteLine("UP"); 
-        lever_arm_motor.SetPercent(UP_Percentage_Lever);
+        lever_arm_motor.SetPercent(UP_Percentage_Lever+15);
         break;
 
         case (DOWN):
@@ -471,6 +511,15 @@ void lever_arm(int position){ //Control the position of the lever arm
         Sleep (2.0);
         lever_arm_motor.Stop();
         break;
+
+        default:
+        lever_arm_motor.Stop();
+        lever_arm_motor.SetPercent(-30);
+        lever_arm_motor.SetPercent(-30);
+        Sleep(2.0);
+        lever_arm_motor.Stop();
+        break;
+
     }
 };
 void move_falling_arm(int position) //Control the position of the falling arm
